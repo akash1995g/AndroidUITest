@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'  # Only run on main branch
     steps:
       # Checkout the repository code
@@ -37,7 +37,7 @@ jobs:
 
 
   build-and-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     # this can only be used in workflow
     strategy:
       matrix:
