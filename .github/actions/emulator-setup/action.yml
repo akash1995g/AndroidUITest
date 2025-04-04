@@ -1,0 +1,115 @@
+name: Emulator Setup
+description: Common setup for Emulator builds
+inputs:
+  api-level:
+    description: 'Android API Level'
+    required: false
+    default: "33"
+  arch:
+    description: 'CPU Arch'
+    required: false
+    default: "x86_64"
+  package:
+    description: "App package name to monitor"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up JDK 17
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # Step 3: Set up Android SDK
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    # Step 4: Install emulator and create an AVD
+    - name: Install emulator and create AVD
+      shell: bash
+      run: |
+        yes | sdkmanager --licenses || true
+        sdkmanager --install  "platform-tools" "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
+        echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
+
+    # Step 5: Start the emulator in the background
+    - name: Start emulator
+      shell: bash
+      run: |
+        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$PATH
+        nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot  -accel off -gpu swiftshader_indirect -skin 1080x2400 -dpi-device 440  &
+        adb wait-for-device
+        echo "Emulator started"
+        until adb shell getprop sys.boot_completed | grep "1"; do sleep 5; done
+        
+        # Unlock emulator
+        echo "Emulator ready"
+        adb shell input keyevent 82
+        
+        APP_PACKAGE=${{ inputs.package }}
+        
+         # Run your connected tests (or any custom tasks)
+        ./gradlew connectedDebugAndroidTest &
+        TEST_PID=$!
+        
+        # Wait for app to be launched (e.g. by UI tests)
+        until adb shell pidof "$APP_PACKAGE" > /dev/null; do
+        echo "⏳ Waiting for $APP_PACKAGE to start..."
+        sleep 3
+        done
+        
+        echo "Starting screen recording with scrcpy..."
+        scrcpy --record ui_test_record.mp4 --no-display &
+        echo $! > scrcpy_pid.txt  # Save process ID
+        
+        echo "⏳ Waiting for tests to complete..."
+        
+        # Loop until the process finishes
+        while kill -0 $TEST_PID 2> /dev/null; do
+        echo "Still running... ⏳"
+        sleep 5  # Wait for 5 seconds before checking again
+        done
+        
+        # Check exit status
+        wait $TEST_PID  # Ensure we capture the exit code
+        EXIT_CODE=$?
+        
+        if [ $EXIT_CODE -eq 0 ]; then
+        echo "✅ Tests completed successfully!"
+        else
+        echo "❌ Tests failed!"
+        exit 1
+        fi
+        
+        echo "🛑 🎥 Stop Screen record"
+        kill $(cat scrcpy_pid.txt)
+        sleep 5  # Ensure the recording is saved
+    
+
+    # Step 10: Archive the recording as an artifact
+    - name: Archive test recording
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-recording-api-${{ inputs.api-level }}
+        path: ui_test_record.mp4
+
+    # Upload Instrumentation Test Reports
+    - name: Upload instrumentation test reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: instrumentation-test-results-api-${{ inputs.api-level }}
+        path: '**/build/reports/androidTests/connected/'
+
+    # Step 12: Stop the emulator
+    - name: Stop emulator
+      shell: bash
+      run: adb emu kill
