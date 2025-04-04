@@ -151,5 +151,5 @@ task("codeCheck") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
-    dependsOn(":app:spotlessApply", ":app:koverXmlReport", ":app:sonar")
+    dependsOn(":app:spotlessApply","lintDebug", ":app:koverXmlReport", ":app:sonar")
 }
