@@ -92,6 +92,7 @@ sonar {
         property("sonar.projectName", getLocalProperty("sonar.name", "config.properties"))
         property("sonar.host.url", getLocalProperty("sonar.url", "config.properties"))
         property("sonar.token", getLocalProperty("sonar.token", "config.properties"))
+        property("sonar.organization", getLocalProperty("sonar.organization", "config.properties"))
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.buildDir}/reports/kover/xml/report.xml"
