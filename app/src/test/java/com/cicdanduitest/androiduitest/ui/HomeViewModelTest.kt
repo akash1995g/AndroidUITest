@@ -3,7 +3,7 @@ package com.cicdanduitest.androiduitest.ui
 import org.junit.Test
 
 class HomeViewModelTest {
-    val viewModel = HomeViewModel()
+    private val viewModel = HomeViewModel()
 
     @Test
     fun testAdd() {
