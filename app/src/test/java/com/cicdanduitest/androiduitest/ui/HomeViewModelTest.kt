@@ -10,4 +10,10 @@ class HomeViewModelTest {
         val result = viewModel.add(1, 1)
         assert(result == 2)
     }
+
+    @Test
+    fun testSub() {
+        val result = viewModel.subtract(1, 1)
+        assert(result == 0)
+    }
 }
