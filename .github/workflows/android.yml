@@ -15,7 +15,8 @@ concurrency:
 
 jobs:
   test:
-    runs-on: self-hosted
+    # runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       APP_PACKAGE: "com.cicdanduitest.androiduitest"
 
