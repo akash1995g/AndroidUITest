@@ -89,7 +89,7 @@ jobs:
           profile: pixel
           force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: |
               echo "emulator is ready"
               echo "emulator is ready 2"
