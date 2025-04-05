@@ -13,9 +13,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RUNNER: ubuntu-latest
+
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     outputs:
       cache-hit: ${{ steps.cache-android.outputs.cache-hit }}
     steps:
@@ -26,7 +29,7 @@ jobs:
         uses: ./.github/actions/android-setup
 
   spotless:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     needs: setup
     steps:
       - name: Checkout code
@@ -39,7 +42,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -52,7 +55,7 @@ jobs:
         run: ./gradlew build
 
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -67,7 +70,7 @@ jobs:
         run: ./gradlew unitTestCoverage
 
   ui-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     timeout-minutes: 30
     needs: spotless
     steps:
@@ -90,7 +93,7 @@ jobs:
           script: ./gradlew connectedDebugAndroidTest
 
   assemble:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     needs: [build, unit-test]  # Depends on both
     steps:
       - name: Checkout code
@@ -104,7 +107,7 @@ jobs:
 
 
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     if: github.ref == 'refs/heads/dontrun'
     #if: github.ref == 'refs/heads/main'
     # this can only be used in workflow
