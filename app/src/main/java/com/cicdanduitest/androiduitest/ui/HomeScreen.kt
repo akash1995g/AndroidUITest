@@ -1,8 +1,21 @@
 package com.cicdanduitest.androiduitest.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
@@ -10,7 +23,35 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val viewModel: HomeViewModel = viewModel()
 }
 
-@Preview
 @Composable
-private fun HomeScreenPreview(modifier: Modifier = Modifier) {
+fun CounterApp() {
+    var count by remember { mutableStateOf(0) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = "Count: $count",
+            modifier = Modifier
+                .testTag("counterText")
+                .padding(bottom = 16.dp),
+            style = MaterialTheme.typography.headlineMedium,
+        )
+
+        Button(
+            onClick = { count++ },
+            modifier = Modifier.testTag("incrementButton"),
+        ) {
+            Text("Increment")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenPreview() {
+    CounterApp()
 }
