@@ -67,6 +67,7 @@ jobs:
       - name: Generate Code Coverage Report
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CURRENT_BRANCH: ${{ github.ref_name }}
         run: ./gradlew unitTestCoverage
 
   assemble:
@@ -102,19 +103,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-#      - name: Start emulator and run tests
-#        uses: reactivecircus/android-emulator-runner@v2
-#        timeout-minutes: 30
-#        with:
-#          api-level: 33
-#          target: google_apis
-#          arch: x86_64
-#          emulator-boot-timeout: 900
-#          disable-animations: true
-#          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
-#          script: |
-#            adb -s emulator-5554 wait-for-device
-#            ./gradlew connectedDebugAndroidTest
+      - name: Start emulator and run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 30
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          emulator-boot-timeout: 900
+          disable-animations: true
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          script: |
+            adb -s emulator-5554 wait-for-device
+            ./gradlew connectedDebugAndroidTest
 
 
   build-and-test:
