@@ -100,7 +100,7 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.buildDir}/reports/kover/xml/report.xml"
         )
-        property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*")
+        property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*.kt")
         val url: String = getLocalProperty("sonar.url", "config.properties").toString()
         if (!url.contains("https://sonarcloud.io")) {
             // Fetch the current Git branch name for community edition
