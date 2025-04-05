@@ -2,9 +2,9 @@ name: Build Android APK
 
 on:
   workflow_dispatch:  # Allows manual trigger
-  #  push:
-  #    branches:
-  #      - main
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -67,6 +67,7 @@ jobs:
       - name: Generate Code Coverage Report
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CURRENT_BRANCH: ${{ github.ref_name }}
         run: ./gradlew unitTestCoverage
 
   assemble:
@@ -114,7 +115,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: |
             adb -s emulator-5554 wait-for-device
-            ./gradlew connectedDebugAndroidTest        
+            ./gradlew connectedDebugAndroidTest
 
 
   build-and-test:

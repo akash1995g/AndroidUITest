@@ -62,11 +62,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    val lifecycle_version = "2.8.7"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
 }
 
 spotless {
@@ -101,10 +100,13 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.buildDir}/reports/kover/xml/report.xml"
         )
-        property("sonar.coverage.exclusions", " **/*Fragment.kt, **/*Activity*")
-        // Fetch the current Git branch name
-        val branchName = getCurrentGitBranch()
-        property("sonar.branch.name", branchName)
+        property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*")
+        val url: String = getLocalProperty("sonar.url", "config.properties").toString()
+        if (!url.contains("https://sonarcloud.io")) {
+            // Fetch the current Git branch name for community edition
+            val branchName = getCurrentGitBranch()
+            property("sonar.branch.name", branchName)
+        }
     }
 }
 
