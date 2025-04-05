@@ -104,7 +104,7 @@ sonar {
         val url: String = getLocalProperty("sonar.url", "config.properties").toString()
         if (!url.contains("https://sonarcloud.io")) {
             // Fetch the current Git branch name for community edition
-            val branchName = getCurrentGitBranch()
+            val branchName = System.getenv("CURRENT_BRANCH") ?: getCurrentGitBranch()
             property("sonar.branch.name", branchName)
         }
     }
