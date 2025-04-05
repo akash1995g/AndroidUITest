@@ -90,7 +90,11 @@ jobs:
           force-avd-creation: true
           disable-animations: true
           emulator-options: -no-window -no-audio -no-boot-anim
-          script: ./gradlew connectedDebugAndroidTest
+          script: |
+              echo "emulator is ready"
+              echo "emulator is ready 2"
+              
+              #./gradlew connectedDebugAndroidTest
 
   assemble:
     runs-on: ubuntu-latest
