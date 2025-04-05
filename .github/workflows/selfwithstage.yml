@@ -1,0 +1,114 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+  #  push:
+  #    branches:
+  #      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache-android.outputs.cache-hit }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+  spotless:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Run Spotless
+        run: ./gradlew spotlessCheck
+
+  build:
+    runs-on: ubuntu-latest
+    needs: spotless
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: spotless
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Generate Code Coverage Report
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew unitTestCoverage
+
+  assemble:
+    runs-on: ubuntu-latest
+    needs: [build, unit-test]  # Depends on both
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build APK
+        run: ./gradlew assembleRelease
+
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    # this can only be used in workflow
+    strategy:
+      matrix:
+        api-level: [ 33 ] #  [ 30, 31, 33 ]  # <-- Customize API levels here!
+        arch: [ x86_64 ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Emulator Environment Setup
+        uses: ./.github/actions/emulator-setup
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          package: com.cicdanduitest.androiduitest
+
+#      # Upload the APK as an artifact using the latest version 4
+#      - name: Upload APK
+#        uses: actions/upload-artifact@v4  # Updated to v3.1.0
+#        with:
+#          name: release-app-build
+#          path: app/build/outputs/apk/release/app-release.apk
+#      # Upload the APK as an artifact using the latest version 4
+#      - name: Upload Unsigned APK
+#        uses: actions/upload-artifact@v4  # Updated to v3.1.0
+#        with:
+#          name: unsigned-build
+#          path: app/build/outputs/apk/release/app-release-unsigned.apk
