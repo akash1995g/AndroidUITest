@@ -25,7 +25,7 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
-  analyze:
+  spotless:
     runs-on: ubuntu-latest
     needs: setup
     steps:
@@ -35,14 +35,12 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
-      - name: Run Code Analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew codeCheck
+      - name: Run Spotless
+        run: ./gradlew spotlessCheck
 
   build:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: spotless
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,7 +53,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: spotless
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,8 +61,10 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
-      - name: Run Unit Tests
-        run: ./gradlew test
+      - name: Run Code Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew unitTestCoverage
 
   assemble:
     runs-on: ubuntu-latest
