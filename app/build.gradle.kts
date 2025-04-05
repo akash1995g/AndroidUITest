@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.ByteArrayOutputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -91,7 +92,10 @@ sonar {
         property("sonar.projectKey", getLocalProperty("sonar.key", "config.properties"))
         property("sonar.projectName", getLocalProperty("sonar.name", "config.properties"))
         property("sonar.host.url", getLocalProperty("sonar.url", "config.properties"))
-        property("sonar.token", getLocalProperty("sonar.token", "config.properties"))
+        property(
+            "sonar.token",
+            System.getenv("SONAR_TOKEN") ?: getLocalProperty("sonar.token", "config.properties")
+        )
         property("sonar.organization", getLocalProperty("sonar.organization", "config.properties"))
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
@@ -151,5 +155,11 @@ task("codeCheck") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
-    dependsOn(":app:spotlessApply","lintDebug", ":app:koverHtmlReport",":app:koverXmlReport", ":app:sonar")
+    dependsOn(
+        ":app:spotlessApply",
+        "lintDebug",
+        ":app:koverHtmlReport",
+        ":app:koverXmlReport",
+        ":app:sonar"
+    )
 }
