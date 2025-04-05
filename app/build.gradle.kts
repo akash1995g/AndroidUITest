@@ -103,10 +103,8 @@ sonar {
         )
         property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*")
         val url: String = getLocalProperty("sonar.url", "config.properties").toString()
-        if (url.contains("https://sonarcloud.io")) {
-
-        } else {
-            // Fetch the current Git branch name
+        if (!url.contains("https://sonarcloud.io")) {
+            // Fetch the current Git branch name for community edition
             val branchName = getCurrentGitBranch()
             property("sonar.branch.name", branchName)
         }
