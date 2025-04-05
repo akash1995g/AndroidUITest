@@ -68,33 +68,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew unitTestCoverage
-#
-#  ui-test:
-#    runs-on: macos-latest #ubuntu-latest
-#    timeout-minutes: 30
-#    needs: spotless
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Android Environment Setup
-#        uses: ./.github/actions/android-setup
-#
-#      - name: Create AVD and launch emulator
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: 30
-#          target: google_apis
-#          arch: x86_64
-#          profile: pixel
-#          force-avd-creation: true
-#          disable-animations: true
-#          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
-#          script: |
-#            echo "emulator is ready"
-#            echo "emulator is ready 2"
-#
-#            #./gradlew connectedDebugAndroidTest
 
   assemble:
     runs-on: ubuntu-latest
@@ -110,33 +83,27 @@ jobs:
         run: ./gradlew assembleRelease
 
 
-  instrumentation-test:
+  ui-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-#        with:
-#          api-level: 33
-#          build-tools: "34.0.0"
-#
-#      - name: Create local.properties
-#        run: echo "sdk.dir=/usr/local/lib/android/sdk" > $GITHUB_WORKSPACE/local.properties
-#
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-
       - name: Start emulator and run tests
         uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 30
         with:
           api-level: 33
           target: google_apis
