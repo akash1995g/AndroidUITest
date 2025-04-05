@@ -22,4 +22,10 @@ class HomeViewModelTest {
         val result = viewModel.div(1, 1)
         assert(result == 1)
     }
+
+    @Test
+    fun testMul() {
+        val result = viewModel.multi(1, 1)
+        assert(result == 1)
+    }
 }
