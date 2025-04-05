@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Only run on main branch
+    # if: github.ref == 'refs/heads/main'  # Only run on main branch
     steps:
       # Checkout the repository code
       - name: Checkout code
@@ -25,8 +25,15 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
+
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          run: ./gradlew codeCheck
+
       - name: Build with Gradle
         run: ./gradlew build
+
 
       - name: Run unit tests
         run: ./gradlew test
