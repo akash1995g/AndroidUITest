@@ -103,8 +103,8 @@ sonar {
         )
         property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*")
         // Fetch the current Git branch name
-        val branchName = getCurrentGitBranch()
-        property("sonar.branch.name", System.getenv("CURRENT_BRANCH") ?: branchName)
+//        val branchName = getCurrentGitBranch()
+//        property("sonar.branch.name", System.getenv("CURRENT_BRANCH") ?: branchName)
     }
 }
 
