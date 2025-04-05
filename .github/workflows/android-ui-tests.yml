@@ -37,4 +37,8 @@ jobs:
           profile: pixel
           emulator-options: -no-window -no-audio -no-boot-anim
           disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest
+          script: |
+            adb wait-for-device
+            adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+            adb shell 'while [[ -z $(getprop init.svc.bootanim) || $(getprop init.svc.bootanim) != "stopped" ]]; do sleep 1; done;'
+            ./gradlew connectedDebugAndroidTest
