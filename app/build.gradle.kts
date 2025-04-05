@@ -101,7 +101,7 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.buildDir}/reports/kover/xml/report.xml"
         )
-        property("sonar.coverage.exclusions", " **/*Fragment.kt, **/*Activity*")
+        property("sonar.coverage.exclusions", "**/*Fragment.kt, **/*Activity*,**/ui/theme/*")
         // Fetch the current Git branch name
         val branchName = getCurrentGitBranch()
         property("sonar.branch.name", branchName)
