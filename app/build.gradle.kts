@@ -157,7 +157,7 @@ task("codeCheck") {
 
     dependsOn(
         ":app:spotlessApply",
-        "lintDebug",
+        "lint",
         ":app:koverHtmlReport",
         ":app:koverXmlReport",
         ":app:sonar"
