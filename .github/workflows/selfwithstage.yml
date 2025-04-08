@@ -135,6 +135,7 @@ jobs:
 
       - name: Emulator Environment Setup
         uses: ./.github/actions/emulator-setup
+        timeout-minutes: 30
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
