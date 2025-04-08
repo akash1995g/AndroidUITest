@@ -91,31 +91,12 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Emulator Environment Setup
+        uses: ./.github/actions/emulator
         with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Start emulator and run tests
-        uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 30
-        with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          emulator-boot-timeout: 900
-          disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
-          script: |
-            adb -s emulator-5554 wait-for-device
-            ./gradlew connectedDebugAndroidTest
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          package: com.cicdanduitest.androiduitest
 
 
   build-and-test:
@@ -134,6 +115,7 @@ jobs:
 
       - name: Emulator Environment Setup
         uses: ./.github/actions/emulator-setup
+        timeout-minutes: 30
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
