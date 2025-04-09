@@ -50,7 +50,7 @@ runs:
         avdmanager list avd
         echo "========================================"
         echo "========================================"
-        emulator
+        emulator -list-avds
         echo "========================================"
         nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot  -accel off -gpu swiftshader_indirect -skin 1080x2400 -dpi-device 440  &
         adb wait-for-device
