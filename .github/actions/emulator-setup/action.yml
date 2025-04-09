@@ -40,6 +40,9 @@ runs:
         sdkmanager --install  "platform-tools" "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
         echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
         avdmanager list avd
+        echo "========================================1"
+        emulator -list-avds
+        echo "========================================1"
 
     # Step 5: Start the emulator in the background
     - name: Start emulator
@@ -47,7 +50,7 @@ runs:
       run: |
         export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$PATH
         echo "========================================"
-        ./emulator -list-avds
+        ls $ANDROID_SDK_ROOT/emulator
         echo "========================================"
         echo "========================================"
         emulator -list-avds
