@@ -42,7 +42,7 @@ runs:
         export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$PATH
         avdmanager list avd
         echo "========================================"
-        emulator -list-avds
+        $ANDROID_SDK_ROOT/emulator/emulator -list-avds
         echo "========================================"
 
     # Step 5: Start the emulator in the background
