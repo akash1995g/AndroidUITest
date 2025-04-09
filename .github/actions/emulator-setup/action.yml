@@ -22,10 +22,10 @@ runs:
       uses: actions/checkout@v4
 
     # Step 2: Set up JDK 17
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
 
     # Step 3: Set up Android SDK
@@ -38,13 +38,24 @@ runs:
       run: |
         yes | sdkmanager --licenses || true
         sdkmanager --install  "platform-tools" "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
+        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
         echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
 
-    # Step 5: Start the emulator in the background
+
+# Step 5: Start the emulator in the background
     - name: Start emulator
       shell: bash
       run: |
-        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$PATH
+        export ANDROID_AVD_HOME=$HOME/.android/avd
+        mkdir -p $ANDROID_AVD_HOME
+        ls $ANDROID_AVD_HOME -la
+        export ANDROID_AVD_HOME=$HOME/.android/avd
+        echo "========================================"
+        avdmanager list avd
+        echo "========================================"
+        echo "========================================"
+        emulator -verbose -list-avds
+        echo "========================================"
         nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot  -accel off -gpu swiftshader_indirect -skin 1080x2400 -dpi-device 440  &
         adb wait-for-device
         echo "Emulator started"
