@@ -92,7 +92,7 @@ jobs:
       matrix:
         api-level: [30] # [ 30, 31, 33 ]  # <-- Customize API levels here!
         arch: [ x86_64 ]
-    needs: spotless
+    #needs: spotless
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
