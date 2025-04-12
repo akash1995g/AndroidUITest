@@ -50,7 +50,7 @@ runs:
         echo "========================================"
         echo "========================================"
         echo "========================================"
-        sdkmanager --install "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
+        sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
 #        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
 #        echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
 #
