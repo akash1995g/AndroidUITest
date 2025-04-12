@@ -77,7 +77,8 @@ runs:
         done
         
         # Unlock emulator
-        echo "Emulator ready"
+        echo "\033[1;36m Emulator ready \033[0m"
+        adb devices
         adb shell input keyevent 82
         
         APP_PACKAGE=${{ inputs.package }}
