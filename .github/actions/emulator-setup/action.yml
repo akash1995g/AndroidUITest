@@ -36,6 +36,16 @@ runs:
 #      shell: bash
 #      run: yes | sdkmanager --licenses
 
+    - name: Install emulator and create AVD
+      shell: bash
+      run: |
+        echo "========================================${{ inputs.api-level }}"
+        echo "========================================"
+        echo "========================================"
+        echo "========================================"
+        echo "========================================"
+        echo "========================================"
+
     - name: Install SDK components
       shell: bash
       run: sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-${{ inputs.api-level }}"
@@ -44,7 +54,7 @@ runs:
     - name: Install emulator and create AVD
       shell: bash
       run: |
-        echo "========================================"
+        echo "========================================${{ inputs.api-level }}"
         echo "========================================"
         echo "========================================"
         echo "========================================"
