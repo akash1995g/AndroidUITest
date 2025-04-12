@@ -41,19 +41,19 @@ runs:
       shell: bash
       run: sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-${{ inputs.api-level }}"
 
+    - name: Install Emulator component
+      shell: bash
+      run:  sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
+
+
     # Step 4: Install emulator and create an AVD
     - name: Install emulator and create AVD
       shell: bash
       run: |
-        echo "========================================${{ inputs.api-level }}"
-        echo "========================================"
-        echo "========================================"
-        echo "========================================"
-        echo "========================================"
-        echo "========================================"
-        sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
-        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
-        echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
+        echo -e "\033[1;32m✅ Build succeeded!\033[0m"
+        #export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+        #echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
+        avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
 
 
     # Step 5: Start the emulator in the background
