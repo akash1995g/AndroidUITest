@@ -66,9 +66,9 @@ runs:
         echo "========================================"
         avdmanager list avd
         echo "========================================"
-        ls $ANDROID_SDK_ROOT
+        ls $ANDROID_SDK_ROOT/emulator
         echo "========================================"
-        emulator -verbose -list-avds
+        $ANDROID_SDK_ROOT/emulator -verbose -list-avds
         echo "========================================"
         nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot  -accel off -gpu swiftshader_indirect -skin 1080x2400 -dpi-device 440  &
         adb wait-for-device
