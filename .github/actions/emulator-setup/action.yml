@@ -32,9 +32,9 @@ runs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
 
-#    - name: Accept Android SDK licenses
-#      shell: bash
-#      run: yes | sdkmanager --licenses
+    #    - name: Accept Android SDK licenses
+    #      shell: bash
+    #      run: yes | sdkmanager --licenses
 
 
     - name: Install SDK components
@@ -43,8 +43,11 @@ runs:
 
     - name: Install Emulator component
       shell: bash
-      run:  sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
+      run: sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
 
+    - name: Add emulator to PATH
+      shell: bash
+      run: echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
 
     # Step 4: Install emulator and create an AVD
     - name: Install emulator and create AVD
