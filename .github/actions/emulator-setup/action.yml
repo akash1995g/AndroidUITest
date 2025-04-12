@@ -68,7 +68,7 @@ runs:
         echo "========================================"
         avdmanager list avd
         echo "========================================"
-        ls $GITHUB_WORKSPACE
+        ls $GITHUB_WORKSPACE -al
         echo "========================================"
         echo -e "\033[1;32m===============================\033[0m"
         ls $ANDROID_AVD_HOME
