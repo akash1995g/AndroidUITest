@@ -89,9 +89,9 @@ jobs:
     runs-on: ubuntu-latest
     #if: github.ref == 'refs/heads/main'
     strategy:
-      matrix:
-        api-level: [30] # [ 30, 31, 33 ]  # <-- Customize API levels here!
-        arch: [ x86_64 ]
+        matrix:
+          api-level: [30] # [ 30, 31, 33 ]  # <-- Customize API levels here!
+          arch: [ x86_64 ]
     #needs: spotless
     steps:
       - name: Checkout the code
