@@ -79,6 +79,10 @@ runs:
         # Unlock emulator
         echo -e "\033[1;36m Emulator ready \033[0m"
         adb devices
+    
+        echo -e "\033[1;31m give permission \033[0m"
+        chmod +x ./gradlew
+        echo -e "\033[1;31m Done \033[0m"
         adb shell input keyevent 82
         
         APP_PACKAGE=${{ inputs.package }}
