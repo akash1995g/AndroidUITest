@@ -51,7 +51,6 @@ runs:
       shell: bash
       run: |
         echo -e "\033[1;32m✅ Build succeeded!\033[0m"
-        #export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
         #echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
         avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
 
@@ -60,6 +59,7 @@ runs:
     - name: Start emulator
       shell: bash
       run: |
+        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
         export ANDROID_AVD_HOME=$HOME/.android/avd
         mkdir -p $ANDROID_AVD_HOME
         ls $ANDROID_AVD_HOME -la
