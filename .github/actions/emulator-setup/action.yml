@@ -53,6 +53,8 @@ runs:
     - name: Install emulator and create AVD
       shell: bash
       run: |
+        export ANDROID_AVD_HOME=$GITHUB_WORKSPACE/.avd
+        mkdir -p "$ANDROID_AVD_HOME"
         #echo "no" | avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
         avdmanager create avd -n test_avd -k "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}" -d "pixel_xl" --force
 
