@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   setup:
+    if: github.ref == 'refs/heads/dontrun'
     runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache-android.outputs.cache-hit }}
@@ -86,13 +87,19 @@ jobs:
 
   ui-test:
     runs-on: ubuntu-latest
-    needs: spotless
+    #if: github.ref == 'refs/heads/main'
+    strategy:
+        matrix:
+          api-level: [30] # [ 30, 31, 33 ]  # <-- Customize API levels here!
+          arch: [ x86_64 ]
+    #needs: spotless
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
 
       - name: Emulator Environment Setup
-        uses: ./.github/actions/emulator
+        uses: ./.github/actions/emulator-setup
+        timeout-minutes: 30
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
