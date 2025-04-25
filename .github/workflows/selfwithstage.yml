@@ -97,7 +97,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      - name: Emulator Environment Setup
+      - name: Manual Emulator Environment Setup
         uses: ./.github/actions/emulator-setup
         timeout-minutes: 30
         with:
