@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   select-runner:
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'stop') }}
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'Stop') }}
     uses: ./.github/workflows/selfwithstage.yml
     with:
       runner: ${{
