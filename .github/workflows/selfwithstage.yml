@@ -1,7 +1,16 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
+    inputs:
+      runner_type:
+        description: 'Select runner type'
+        required: true
+        default: 'ubuntu-latest'  # Or self-hosted
+        type: choice
+        options:
+          - ubuntu-latest
+          - self-hosted
   push:
     branches:
       - main
