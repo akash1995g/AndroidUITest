@@ -7,7 +7,8 @@ on:
         required: true
         type: string
     secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_TOKEN: # Declare secrets you will use in the steps
+        required: true
 
 # self-hosted
 # ubuntu-latest
