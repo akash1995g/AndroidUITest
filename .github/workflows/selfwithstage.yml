@@ -15,7 +15,7 @@ on:
 
 jobs:
   setup:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     outputs:
       cache-hit: ${{ steps.cache-android.outputs.cache-hit }}
     steps:
@@ -26,7 +26,7 @@ jobs:
         uses: ./.github/actions/android-setup
 
   spotless:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     needs: setup
     steps:
       - name: Checkout code
@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
   build:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -52,7 +52,7 @@ jobs:
         run: ./gradlew build
 
   unit-test:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -68,7 +68,7 @@ jobs:
         run: ./gradlew unitTestCoverage
 
   assemble:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     needs: [ build, unit-test, ui-test ]
     steps:
       - name: Checkout code
@@ -82,7 +82,7 @@ jobs:
 
 
   ui-test:
-    runs-on: ${{ inputs.runner_type }}
+    runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout the code
