@@ -24,7 +24,8 @@ concurrency:
 
 
 jobs:
-  setup-spotless-build-unit-ui-assemble:
+  select-runner:
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'stop') }}
     uses: ./.github/workflows/selfwithstage.yml
     with:
       runner: ${{
