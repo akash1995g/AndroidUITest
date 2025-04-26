@@ -1,26 +1,12 @@
-name: Build Android APK
+name: Build Android Reusable
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      runner_type:
-        description: 'Select runner type'
+      runner:
         required: true
-        default: 'ubuntu-latest'  # Or self-hosted
-        type: choice
-        options:
-          - ubuntu-latest
-          - self-hosted
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+        type: string
+    secrets: inherit
 
 # self-hosted
 # ubuntu-latest
