@@ -22,13 +22,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  DEFAULT_RUNNER: ubuntu-latest
-  SELF_HOSTED_RUNNER: self-hosted
 
 jobs:
   setup-spotless-build-unit-ui-assemble:
     uses: ./.github/workflows/selfwithstage.yml
     with:
-      runner: ${{ (github.event_name == 'push' || github.event_name == 'pull_request') && env.SELF_HOSTED_RUNNER || env.DEFAULT_RUNNER }}
+      runner: ${{ (github.event_name == 'push' || github.event_name == 'pull_request') && 'self-hosted' || 'ubuntu-latest' }}
     secrets: inherit
