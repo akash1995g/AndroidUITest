@@ -98,6 +98,8 @@ runs:
         echo "⏳ Waiting for $APP_PACKAGE to start..."
         sleep 3
         done
+        
+        apt install scrcpy
 
         echo "Starting screen recording with scrcpy..."
         scrcpy --record ui_test_record.mp4 --no-display &
