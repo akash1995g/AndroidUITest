@@ -47,7 +47,5 @@ runs:
           echo "My device ready"
           echo -e "\033[1;32m✅ Start Emulator \033[0m"
           adb devices
-          echo -e "\033[1;32m✅ List Emulator from Avd Manager \033[0m"
-          emulator -list-avds
           adb -s emulator-5554 wait-for-device
           ./gradlew connectedDebugAndroidTest
