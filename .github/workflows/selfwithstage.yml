@@ -80,7 +80,6 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease
 
-
   ui-test:
     runs-on: ${{ inputs.runner }}
     strategy:
