@@ -83,7 +83,7 @@ jobs:
 
   ui-test:
     runs-on: ${{ inputs.runner }}
-    needs: spotless
+    # needs: spotless
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
