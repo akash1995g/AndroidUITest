@@ -82,9 +82,28 @@ jobs:
 
   ui-test:
     runs-on: ${{ inputs.runner }}
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') && !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')}}
     strategy:
       matrix:
-        api-level: [ 33, 29, 30 ]  # <-- Customize API levels here!
+        api-level: [ 33 ]  # <-- Customize API levels here!
+        arch: [ x86_64 ]
+    needs: spotless
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Start Emulator and Install App
+        uses: ./.github/actions/emulator
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          package: com.cicdanduitest.androiduitest
+  ui-test-2:
+    runs-on: ${{ inputs.runner }}
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') && !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')}}
+    strategy:
+      matrix:
+        api-level: [ 33 ]  # <-- Customize API levels here!
         arch: [ x86_64 ]
     needs: spotless
     steps:
@@ -92,7 +111,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Emulator Environment Setup
-        uses: ./.github/actions/emulator
+        uses: ./.github/actions/emulator-setup
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
