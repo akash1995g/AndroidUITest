@@ -37,7 +37,7 @@ runs:
     - name: Start emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: ${{inputs.api_level}}
+        api-level: ${{inputs.api-level}}
         target: google_apis
         arch: ${{inputs.arch}}
         emulator-boot-timeout: 900
