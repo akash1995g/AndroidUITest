@@ -69,7 +69,8 @@ jobs:
 
   assemble:
     runs-on: ${{ inputs.runner }}
-    needs: [ build, unit-test, ui-test ]
+    needs: [ build, unit-test, ui-test, ui-test-2 ]
+    if: ${{ always() && needs.build.result == 'success' && needs.unit-test.result == 'success' && (needs.ui-test.result == 'success' || needs.ui-test.result == 'skipped') && (needs.ui-test-2.result == 'success' || needs.ui-test-2.result == 'skipped') }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
