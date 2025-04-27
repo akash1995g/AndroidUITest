@@ -88,7 +88,7 @@ runs:
         APP_PACKAGE=${{ inputs.package }}
         
          # Run your connected tests (or any custom tasks)
-        ./gradlew connectedDebugAndroidTest &
+        ./gradlew connectedDebugAndroidTest
 #        TEST_PID=$!
 #
 #        # Wait for app to be launched (e.g. by UI tests)
@@ -131,16 +131,16 @@ runs:
 #      with:
 #        name: test-recording-api-${{ inputs.api-level }}
 #        path: ui_test_record.mp4
-
-    # Upload Instrumentation Test Reports
-    - name: Upload instrumentation test reports
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: instrumentation-test-results-api-${{ inputs.api-level }}
-        path: '**/build/reports/androidTests/connected/'
-
-    # Step 12: Stop the emulator
-    - name: Stop emulator
-      shell: bash
-      run: adb emu kill
+#
+#    # Upload Instrumentation Test Reports
+#    - name: Upload instrumentation test reports
+#      if: always()
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: instrumentation-test-results-api-${{ inputs.api-level }}
+#        path: '**/build/reports/androidTests/connected/'
+#
+#    # Step 12: Stop the emulator
+#    - name: Stop emulator
+#      shell: bash
+#      run: adb emu kill
