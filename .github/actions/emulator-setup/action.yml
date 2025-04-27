@@ -41,6 +41,10 @@ runs:
       shell: bash
       run: sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-${{ inputs.api-level }}"
 
+    - name: Install SDK components
+      shell: bash
+      run: apt install scrcpy
+
     - name: Install Emulator component
       shell: bash
       run: sdkmanager "emulator" "system-images;android-${{ inputs.api-level }};google_apis;${{ inputs.arch }}"
@@ -98,8 +102,6 @@ runs:
         echo "⏳ Waiting for $APP_PACKAGE to start..."
         sleep 3
         done
-        
-        apt install scrcpy
 
         echo "Starting screen recording with scrcpy..."
         scrcpy --record ui_test_record.mp4 --no-display &
