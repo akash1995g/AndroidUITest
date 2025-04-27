@@ -118,7 +118,7 @@ jobs:
           (
           github.event_name == 'pull_request' &&
           !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
-          !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
+          contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
           ) || (
           github.event_name == 'workflow_dispatch' &&
           (github.event.inputs.ui_test == 'self')
