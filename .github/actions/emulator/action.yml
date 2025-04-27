@@ -44,8 +44,5 @@ runs:
         disable-animations: true
         emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -camera-back none
         script: |
-          echo "My device ready"
-          echo -e "\033[1;32m✅ Start Emulator \033[0m"
-          adb devices
-          adb -s emulator-5554 wait-for-device
+          echo -e "\033[1;32m✅ Emulator Ready \033[0m"
           ./gradlew connectedDebugAndroidTest
