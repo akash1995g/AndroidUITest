@@ -90,59 +90,59 @@ runs:
         APP_PACKAGE=${{ inputs.package }}
         
          # Run your connected tests (or any custom tasks)
-        ./gradlew connectedDebugAndroidTest
-#        TEST_PID=$!
-#
-#        # Wait for app to be launched (e.g. by UI tests)
-#        until adb shell pidof "$APP_PACKAGE" > /dev/null; do
-#        echo "⏳ Waiting for $APP_PACKAGE to start..."
-#        sleep 3
-#        done
-#
-#        echo "Starting screen recording with scrcpy..."
-#        scrcpy --record ui_test_record.mp4 --no-display &
-#        echo $! > scrcpy_pid.txt  # Save process ID
-#
-#        echo "⏳ Waiting for tests to complete..."
-#
-#        # Loop until the process finishes
-#        while kill -0 $TEST_PID 2> /dev/null; do
-#        echo "Still running... ⏳"
-#        sleep 5  # Wait for 5 seconds before checking again
-#        done
-#
-#        # Check exit status
-#        wait $TEST_PID  # Ensure we capture the exit code
-#        EXIT_CODE=$?
-#
-#        if [ $EXIT_CODE -eq 0 ]; then
-#        echo "✅ Tests completed successfully!"
-#        else
-#        echo "❌ Tests failed!"
-#        exit 1
-#        fi
-#
-#        echo "🛑 🎥 Stop Screen record"
-#        kill $(cat scrcpy_pid.txt)
-#        sleep 5  # Ensure the recording is saved
+        ./gradlew connectedDebugAndroidTest &
+        TEST_PID=$!
+
+        # Wait for app to be launched (e.g. by UI tests)
+        until adb shell pidof "$APP_PACKAGE" > /dev/null; do
+        echo "⏳ Waiting for $APP_PACKAGE to start..."
+        sleep 3
+        done
+
+        echo "Starting screen recording with scrcpy..."
+        scrcpy --record ui_test_record.mp4 --no-display &
+        echo $! > scrcpy_pid.txt  # Save process ID
+
+        echo "⏳ Waiting for tests to complete..."
+
+        # Loop until the process finishes
+        while kill -0 $TEST_PID 2> /dev/null; do
+        echo "Still running... ⏳"
+        sleep 5  # Wait for 5 seconds before checking again
+        done
+
+        # Check exit status
+        wait $TEST_PID  # Ensure we capture the exit code
+        EXIT_CODE=$?
+
+        if [ $EXIT_CODE -eq 0 ]; then
+        echo "✅ Tests completed successfully!"
+        else
+        echo "❌ Tests failed!"
+        exit 1
+        fi
+
+        echo "🛑 🎥 Stop Screen record"
+        kill $(cat scrcpy_pid.txt)
+        sleep 5  # Ensure the recording is saved
     
-#
-#    # Step 10: Archive the recording as an artifact
-#    - name: Archive test recording
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: test-recording-api-${{ inputs.api-level }}
-#        path: ui_test_record.mp4
-#
-#    # Upload Instrumentation Test Reports
-#    - name: Upload instrumentation test reports
-#      if: always()
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: instrumentation-test-results-api-${{ inputs.api-level }}
-#        path: '**/build/reports/androidTests/connected/'
-#
-#    # Step 12: Stop the emulator
-#    - name: Stop emulator
-#      shell: bash
-#      run: adb emu kill
+
+    # Step 10: Archive the recording as an artifact
+    - name: Archive test recording
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-recording-api-${{ inputs.api-level }}
+        path: ui_test_record.mp4
+
+    # Upload Instrumentation Test Reports
+    - name: Upload instrumentation test reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: instrumentation-test-results-api-${{ inputs.api-level }}
+        path: '**/build/reports/androidTests/connected/'
+
+    # Step 12: Stop the emulator
+    - name: Stop emulator
+      shell: bash
+      run: adb emu kill
