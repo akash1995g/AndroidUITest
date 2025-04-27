@@ -40,7 +40,7 @@ runs:
         api-level: ${{inputs.api_level}}
         target: google_apis
         arch: ${{inputs.arch}}
-        emulator-boot-timeout: 300
+        emulator-boot-timeout: 900
         disable-animations: true
         emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
         script: |
