@@ -6,6 +6,9 @@ on:
       runner:
         required: true
         type: string
+      ui_test:
+        required: true
+        type: string
     secrets:
       SONAR_TOKEN: # Declare secrets you will use in the steps
         required: true
@@ -83,7 +86,16 @@ jobs:
 
   ui-test:
     runs-on: ${{ inputs.runner }}
-    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') && !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')}}
+    if: ${{ 
+          (
+          github.event_name == 'pull_request' &&
+          !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
+          !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
+          ) || (
+          github.event_name == 'workflow_dispatch' &&
+          (github.event.inputs.ui_test == 'self' || github.event.inputs.ui_test == 'lib')
+          )
+        }}
     strategy:
       matrix:
         api-level: [ 33 ]  # <-- Customize API levels here!
