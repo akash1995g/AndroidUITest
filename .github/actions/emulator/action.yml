@@ -4,7 +4,7 @@ inputs:
   api-level:
     description: 'Android API Level'
     required: false
-    default: "33"
+    default: "30"
   arch:
     description: 'CPU Arch'
     required: false
@@ -37,9 +37,9 @@ runs:
     - name: Start emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 33
+        api-level: ${{inputs.api_level}}
         target: google_apis
-        arch: x86_64
+        arch: ${{inputs.arch}}
         emulator-boot-timeout: 300
         disable-animations: true
         emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect

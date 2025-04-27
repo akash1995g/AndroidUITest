@@ -83,6 +83,10 @@ jobs:
 
   ui-test:
     runs-on: ${{ inputs.runner }}
+    strategy:
+      matrix:
+        api-level: [ 30 ]  # <-- Customize API levels here!
+        arch: [ x86_64 ]
     # needs: spotless
     steps:
       - name: Checkout the code
