@@ -84,7 +84,7 @@ jobs:
     runs-on: ${{ inputs.runner }}
     strategy:
       matrix:
-        api-level: [ 33 ]  # <-- Customize API levels here!
+        api-level: [ 33, 29, 30 ]  # <-- Customize API levels here!
         arch: [ x86_64 ]
     needs: spotless
     steps:
