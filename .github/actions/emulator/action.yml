@@ -42,7 +42,7 @@ runs:
         arch: ${{ inputs.arch }}
         emulator-boot-timeout: 900
         disable-animations: true
-        emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+        emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -camera-back none
         script: |
           echo "My device ready"
           echo -e "\033[1;32m✅ Start Emulator \033[0m"
