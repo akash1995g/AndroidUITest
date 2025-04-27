@@ -11,6 +11,15 @@ on:
         options:
           - ubuntu-latest
           - self-hosted
+      ui_runner:
+        description: 'Select UI test runner'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - self
+          - lib
   push:
     branches:
       - main
