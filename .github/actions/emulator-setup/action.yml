@@ -143,6 +143,7 @@ runs:
         sleep 5  # Ensure the recording is saved
     
 
+
     # Step 10: Archive the recording as an artifact
     - name: Archive test recording
       uses: actions/upload-artifact@v4
