@@ -1,34 +1,21 @@
-name: Build Android APK
+name: Build Android Reusable
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      runner_type:
-        description: 'Select runner type'
+      runner:
         required: true
-        default: 'ubuntu-latest'  # Or self-hosted
-        type: choice
-        options:
-          - ubuntu-latest
-          - self-hosted
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+        type: string
+    secrets:
+      SONAR_TOKEN: # Declare secrets you will use in the steps
+        required: true
 
 # self-hosted
 # ubuntu-latest
 
 jobs:
   setup:
-    if: github.ref == 'refs/heads/dontrun'
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     outputs:
       cache-hit: ${{ steps.cache-android.outputs.cache-hit }}
     steps:
@@ -39,7 +26,7 @@ jobs:
         uses: ./.github/actions/android-setup
 
   spotless:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: setup
     steps:
       - name: Checkout code
@@ -52,7 +39,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -65,7 +52,7 @@ jobs:
         run: ./gradlew build
 
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout code
@@ -81,7 +68,7 @@ jobs:
         run: ./gradlew unitTestCoverage
 
   assemble:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     needs: [ build, unit-test, ui-test ]
     steps:
       - name: Checkout code
@@ -93,22 +80,19 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease
 
-
   ui-test:
-    runs-on: ubuntu-latest
-    #if: github.ref == 'refs/heads/main'
+    runs-on: ${{ inputs.runner }}
     strategy:
-        matrix:
-          api-level: [30] # [ 30, 31, 33 ]  # <-- Customize API levels here!
-          arch: [ x86_64 ]
-    #needs: spotless
+      matrix:
+        api-level: [ 33 ]  # <-- Customize API levels here!
+        arch: [ x86_64 ]
+    needs: spotless
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      - name: Manual Emulator Environment Setup
-        uses: ./.github/actions/emulator-setup
-        timeout-minutes: 30
+      - name: Emulator Environment Setup
+        uses: ./.github/actions/emulator
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
