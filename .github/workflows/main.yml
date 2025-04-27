@@ -1,0 +1,42 @@
+name: Android Build Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner_type:
+        description: 'Select runner type'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - ubuntu-latest
+          - self-hosted
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # This job is responsible for selecting the appropriate runner type.
+  # It checks the event name and, based on it, decides which runner to use.
+  # - For 'workflow_dispatch' events, it uses the 'runner_type' input.
+  # - For 'pull_request' or 'push' events, it checks for the 'Self-hosted' label.
+  #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
+  # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
+  select-runner:
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop') }}
+    uses: ./.github/workflows/selfwithstage.yml
+    with:
+      runner: ${{
+        github.event_name == 'workflow_dispatch' && inputs.runner_type ||
+        (github.event_name == 'pull_request' || github.event_name == 'push') &&
+        (contains(github.event.pull_request.labels.*.name, 'Self-hosted') && 'self-hosted' || 'ubuntu-latest')
+        }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
