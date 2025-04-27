@@ -11,6 +11,15 @@ on:
         options:
           - ubuntu-latest
           - self-hosted
+      ui_test:
+        description: 'Select UI test runner'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - self
+          - lib
   push:
     branches:
       - main
@@ -38,5 +47,6 @@ jobs:
         (github.event_name == 'pull_request' || github.event_name == 'push') &&
         (contains(github.event.pull_request.labels.*.name, 'Self-hosted') && 'self-hosted' || 'ubuntu-latest')
         }}
+      ui_test: ${{ inputs.ui_test || 'none' }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
