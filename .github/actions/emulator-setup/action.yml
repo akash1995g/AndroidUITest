@@ -43,7 +43,9 @@ runs:
 
     - name: Install SDK components
       shell: bash
-      run: apt install scrcpy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y scrcpy adb  
 
     - name: Install Emulator component
       shell: bash
