@@ -68,7 +68,7 @@ runs:
         echo -e "\033[1;32m✅ List Emulator \033[0m"
         emulator -verbose -list-avds
         echo -e "\033[1;33m--------------------------- \033[0m"
-        nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot  -accel off -gpu swiftshader_indirect -camera-back none -skin 1080x2400 -dpi-device 440  &
+        nohup emulator -avd test_avd -no-audio -no-boot-anim -no-window -no-snapshot -no-snapshot-save -accel off -gpu swiftshader_indirect -camera-back none -wipe-data -skin 1080x2400 -dpi-device 440  &
         adb wait-for-device
         echo "Emulator started"
         until adb shell getprop sys.boot_completed | grep "1"; do
