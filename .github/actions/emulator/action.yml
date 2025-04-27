@@ -4,7 +4,7 @@ inputs:
   api-level:
     description: 'Android API Level'
     required: false
-    default: "33"
+    default: "30"
   arch:
     description: 'CPU Arch'
     required: false
@@ -37,12 +37,13 @@ runs:
     - name: Start emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 33
+        api-level: ${{ inputs.api-level }}
         target: google_apis
-        arch: x86_64
+        arch: ${{ inputs.arch }}
         emulator-boot-timeout: 900
         disable-animations: true
-        emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+        emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -camera-back none
         script: |
+          echo -e "\033[1;32m✅ Emulator Ready \033[0m"
           adb -s emulator-5554 wait-for-device
           ./gradlew connectedDebugAndroidTest
