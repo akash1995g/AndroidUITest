@@ -30,7 +30,7 @@ jobs:
   #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
   # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
   select-runner:
-    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop') }}
+    if: ${{ (github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop')) || github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/selfwithstage.yml
     with:
       runner: ${{
