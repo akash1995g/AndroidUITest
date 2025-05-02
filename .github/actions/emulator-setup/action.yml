@@ -97,7 +97,7 @@ runs:
         
         GRADLE_PID=$!
         
-        echo "⏳ Waiting for 'starting X test' in Gradle output..."
+        echo "⏳ Waiting for 'Starting X test' in Gradle output..."
         
         # Loop until the pattern appears
         while ! grep -qE "Starting [0-9]+ test" gradle_output.log; do
@@ -106,7 +106,7 @@ runs:
         sleep 1
         done
       
-        echo "✅ Detected: $(grep -E 'starting [0-9]+ test' gradle_output.log)"
+        echo "✅ Detected"
 
         echo "Starting screen recording with scrcpy..."
         scrcpy --record ui_test_record.mp4 --no-display &
