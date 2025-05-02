@@ -100,8 +100,8 @@ runs:
         TEST_PID=$!
 
         # Wait for app to be launched (e.g. by UI tests)
-        until adb shell pidof "$APP_PACKAGE" > /dev/null; do
-        echo "⏳ Waiting for $APP_PACKAGE to start..."
+        until adb logcat -d | grep -qE "starting [0-9]+ test"; do
+        echo "⏳ Waiting for 'starting X test' log..."
         sleep 3
         done
 
