@@ -100,6 +100,7 @@ runs:
         
         # Loop until the pattern appears
         while ! grep -qE "Starting [0-9]+ test" gradle_output.log; do
+        echo "🔍 $(tail -n 1 gradle_output.log)"
         echo "wait"
         sleep 1
         done
