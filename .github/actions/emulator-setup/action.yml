@@ -154,6 +154,13 @@ runs:
         path: '**/build/reports/androidTests/connected/'
         retention-days: 1
 
+    - name: Upload instrumentation test reports1
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: file-${{ inputs.api-level }}
+        path: gradle_output.log
+        retention-days: 1
     # Step 12: Stop the emulator
     - name: Stop emulator
       shell: bash
