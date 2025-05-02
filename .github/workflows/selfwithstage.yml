@@ -126,7 +126,7 @@ jobs:
       }}
     strategy:
       matrix:
-        api-level: [ 29 ]  # <-- Customize API levels here!
+        api-level: [ 30 ]  # <-- Customize API levels here!
         arch: [ x86_64 ]
     needs: spotless
     steps:
