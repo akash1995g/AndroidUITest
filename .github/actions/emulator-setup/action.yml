@@ -94,8 +94,7 @@ runs:
         adb shell input keyevent 82
              
         ./gradlew connectedDebugAndroidTest > gradle_output.log 2>&1 &
-        
-        GRADLE_PID=$!
+        $TEST_PID=$!
         
         echo "⏳ Waiting for 'Starting X test' in Gradle output..."
         
