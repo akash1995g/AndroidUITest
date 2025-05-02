@@ -96,13 +96,18 @@ runs:
         APP_PACKAGE=${{ inputs.package }}
              
         # Run your connected tests in the background
-        ./gradlew connectedDebugAndroidTest > gradle_output.log 2>&1 &
-        TEST_PID=$!
+        LOGFILE="gradle_output.log" : > "$LOGFILE"  # Clear file first
         
-        # Wait for 'starting X test' to appear in the Gradle output
-        echo "⏳ Waiting for 'starting X test' log..."
-        until grep -qE "starting [0-9]+ test" gradle_output.log; do
-        sleep 2
+        ./gradlew connectedDebugAndroidTest > "$LOGFILE" 2>&1 &
+        
+        GRADLE_PID=$!
+        
+        echo "⏳ Waiting for 'starting X test' in Gradle output..."
+        
+        # Loop until the pattern appears
+        while ! grep -qE "starting [0-9]+ test" "$LOGFILE"; do
+        echo "wait"
+        sleep 1
         done
       
         echo "✅ Detected: $(grep -E 'starting [0-9]+ test' gradle_output.log)"
