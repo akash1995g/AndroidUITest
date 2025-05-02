@@ -92,13 +92,7 @@ runs:
         chmod +x ./gradlew
         echo -e "\033[1;31m Done \033[0m"
         adb shell input keyevent 82
-        
-        APP_PACKAGE=${{ inputs.package }}
              
-        # Run your connected tests in the background
-        LOGFILE="gradle_output.log" : > "$LOGFILE"  # Clear file first
-        
-        ./gradlew connectedDebugAndroidTest > "$LOGFILE" 2>&1 &
         ./gradlew connectedDebugAndroidTest > gradle_output.log 2>&1 &
         
         GRADLE_PID=$!
