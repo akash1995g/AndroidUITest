@@ -94,16 +94,18 @@ runs:
         adb shell input keyevent 82
         
         APP_PACKAGE=${{ inputs.package }}
-        
-         # Run your connected tests (or any custom tasks)
-        ./gradlew connectedDebugAndroidTest &
+             
+        # Run your connected tests in the background
+        ./gradlew connectedDebugAndroidTest > gradle_output.log 2>&1 &
         TEST_PID=$!
-
-        # Wait for app to be launched (e.g. by UI tests)
-        until adb logcat -d | grep -qE "starting [0-9]+ test"; do
+        
+        # Wait for 'starting X test' to appear in the Gradle output
         echo "⏳ Waiting for 'starting X test' log..."
-        sleep 3
+        until grep -qE "starting [0-9]+ test" gradle_output.log; do
+        sleep 2
         done
+      
+        echo "✅ Detected: $(grep -E 'starting [0-9]+ test' gradle_output.log)"
 
         echo "Starting screen recording with scrcpy..."
         scrcpy --record ui_test_record.mp4 --no-display &
