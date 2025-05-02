@@ -9,9 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,13 +26,14 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun CounterApp() {
-    var count by remember { mutableStateOf(0) }
+    var count by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Count: $count",
@@ -46,6 +48,13 @@ fun CounterApp() {
             modifier = Modifier.testTag("incrementButton"),
         ) {
             Text("Increment")
+        }
+
+        Button(
+            onClick = { count-- },
+            modifier = Modifier.testTag("decrementButton"),
+        ) {
+            Text("Decrement")
         }
     }
 }

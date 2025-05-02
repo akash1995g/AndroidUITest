@@ -33,4 +33,31 @@ class HomeScreenKtTest {
             .onNodeWithTag("counterText")
             .assertTextEquals("Count: 1")
     }
+
+    @Test
+    fun decrementButton_decreasesCounter() {
+        composeTestRule.setContent {
+            CounterApp()
+        }
+
+        // Perform click
+        composeTestRule
+            .onNodeWithTag("incrementButton")
+            .performClick()
+
+        // Check updated state
+        composeTestRule
+            .onNodeWithTag("counterText")
+            .assertTextEquals("Count: 1")
+
+        // Perform click
+        composeTestRule
+            .onNodeWithTag("decrementButton")
+            .performClick()
+
+        // Check updated state
+        composeTestRule
+            .onNodeWithTag("counterText")
+            .assertTextEquals("Count: 0")
+    }
 }
