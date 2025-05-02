@@ -99,13 +99,14 @@ runs:
         LOGFILE="gradle_output.log" : > "$LOGFILE"  # Clear file first
         
         ./gradlew connectedDebugAndroidTest > "$LOGFILE" 2>&1 &
+        ./gradlew connectedDebugAndroidTest > gradle_output.log 2>&1 &
         
         GRADLE_PID=$!
         
         echo "⏳ Waiting for 'starting X test' in Gradle output..."
         
         # Loop until the pattern appears
-        while ! grep -qE "starting [0-9]+ test" "$LOGFILE"; do
+        while ! grep -qE "Starting [0-9]+ test" gradle_output.log; do
         echo "wait"
         sleep 1
         done
