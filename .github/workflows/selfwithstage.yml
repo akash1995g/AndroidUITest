@@ -70,6 +70,24 @@ jobs:
           CURRENT_BRANCH: ${{ github.ref_name }}
         run: ./gradlew unitTestCoverage
 
+  unit-test1:
+    runs-on: ${{ inputs.runner }}
+    needs: spotless
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Run tests and generate coverage report
+        run: ./gradlew test unitTestCoverageReport
+
+      - name: Upload code coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./build/reports/kover/xml/report.xml
+
   assemble:
     runs-on: ${{ inputs.runner }}
     needs: [ build, unit-test, ui-test, ui-test-2 ]

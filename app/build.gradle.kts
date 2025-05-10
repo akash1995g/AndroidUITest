@@ -178,3 +178,14 @@ task("unitTestCoverage") {
         ":app:sonar"
     )
 }
+
+task("unitTestCoverageReport") {
+    group = "verification"
+    description = "Generates the Kover XML report and then runs SonarQube analysis."
+
+    dependsOn(
+        "lintDebug",
+        ":app:koverHtmlReport",
+        ":app:koverXmlReport"
+    )
+}
