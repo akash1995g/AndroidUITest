@@ -72,6 +72,10 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    implementation(libs.retrofit)
+    // gson converter
+    implementation(libs.converter.gson)
 }
 
 spotless {
