@@ -20,8 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    val viewModel: HomeViewModel = viewModel()
+fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+//    val viewModel: HomeViewModel = viewModel()
+    CounterApp()
 }
 
 @Composable
