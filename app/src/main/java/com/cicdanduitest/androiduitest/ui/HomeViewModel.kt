@@ -3,6 +3,7 @@ package com.cicdanduitest.androiduitest.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cicdanduitest.androiduitest.models.ApiResponse
+import com.cicdanduitest.androiduitest.usecase.GetProductByIdUseCase
 import com.cicdanduitest.androiduitest.usecase.GetProductListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getProductListUseCase: GetProductListUseCase
+    private val getProductList: GetProductListUseCase,
+    private val getProductById: GetProductByIdUseCase
 ) : ViewModel() {
 
     fun add(a: Int, b: Int): Int = a + b
@@ -20,7 +22,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            with(getProductListUseCase()) {
+            with(getProductById()) {
                 when (this) {
                     is ApiResponse.ApiError -> {
                         println("ApiError $this")
