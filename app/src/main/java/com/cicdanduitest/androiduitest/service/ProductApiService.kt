@@ -10,6 +10,7 @@ interface ProductApiService {
     @GET("products")
     suspend fun getAllProducts(): Response<Products>
 
-    @GET("product/1")
+    @GET("products/1")
     suspend fun getProductById(): Response<ProductsItem>
+
 }

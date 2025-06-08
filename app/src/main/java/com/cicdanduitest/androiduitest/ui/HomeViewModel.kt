@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            with(getProductById()) {
+            with(getProductList()) {
                 when (this) {
                     is ApiResponse.ApiError -> {
                         println("ApiError $this")
