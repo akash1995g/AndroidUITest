@@ -11,5 +11,4 @@ interface ProductApiService {
 
     @GET("products/1")
     suspend fun getProductById(): Response<ProductsItem>
-
 }

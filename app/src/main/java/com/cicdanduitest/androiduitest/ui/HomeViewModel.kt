@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getProductList: GetProductListUseCase,
-    private val getProductById: GetProductByIdUseCase
+    private val getProductById: GetProductByIdUseCase,
 ) : ViewModel() {
 
     fun add(a: Int, b: Int): Int = a + b

@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import retrofit2.Response.success
 
-
 class ProductRepositoryTest {
     private val productApiService = mockk<ProductApiService>()
     private val productRepository = ProductRepository(productApiService)
@@ -22,13 +21,13 @@ class ProductRepositoryTest {
         image = "image",
         price = 1.0,
         rating = Rating(count = 1, rate = 1.0),
-        title = "title"
+        title = "title",
     )
 
     @Test
     fun testGetAllProducts() = runTest {
         coEvery { productApiService.getAllProducts() } returns success(
-            listOf(productsItem)
+            listOf(productsItem),
         )
         val result = productRepository.getAllProducts()
         coEvery { productApiService.getAllProducts() } returns success(emptyList())
@@ -41,5 +40,4 @@ class ProductRepositoryTest {
         val result = productRepository.getProductById()
         assertThat(result).isEqualTo(ApiResponse.Success(data = productsItem))
     }
-
 }

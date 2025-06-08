@@ -5,7 +5,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
-
 class GetProductListUseCaseTest {
 
     private val productRepository = mockk<ProductRepository>(relaxed = true)
@@ -16,5 +15,4 @@ class GetProductListUseCaseTest {
         getProductListUseCase()
         coVerify { productRepository.getAllProducts() }
     }
-
 }

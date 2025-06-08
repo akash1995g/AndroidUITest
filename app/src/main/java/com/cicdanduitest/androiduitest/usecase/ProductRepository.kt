@@ -7,7 +7,7 @@ import com.cicdanduitest.androiduitest.utils.safeApiCall
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
-    private val productApiService: ProductApiService
+    private val productApiService: ProductApiService,
 ) {
     suspend fun getAllProducts(): ApiResponse<List<ProductsItem>> {
         return safeApiCall { productApiService.getAllProducts() }

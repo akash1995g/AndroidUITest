@@ -6,7 +6,7 @@ import org.junit.Test
 class HomeViewModelTest {
     private val viewModel = HomeViewModel(
         getProductList = mockk(),
-        getProductById = mockk()
+        getProductById = mockk(),
     )
 
     @Test

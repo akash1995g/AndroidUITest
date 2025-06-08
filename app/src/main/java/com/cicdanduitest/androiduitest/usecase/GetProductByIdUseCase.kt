@@ -8,5 +8,4 @@ class GetProductByIdUseCase @Inject constructor(private val productRepository: P
     suspend operator fun invoke(): ApiResponse<ProductsItem> {
         return productRepository.getProductById()
     }
-
 }
