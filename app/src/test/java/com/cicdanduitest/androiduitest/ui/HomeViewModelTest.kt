@@ -1,9 +1,13 @@
 package com.cicdanduitest.androiduitest.ui
 
+import io.mockk.mockk
 import org.junit.Test
 
 class HomeViewModelTest {
-    private val viewModel = HomeViewModel()
+    private val viewModel = HomeViewModel(
+        getProductList = mockk(),
+        getProductById = mockk(),
+    )
 
     @Test
     fun testAdd() {
