@@ -6,13 +6,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class GetProductListUseCaseTest {
-
     private val productRepository = mockk<ProductRepository>(relaxed = true)
     private val getProductListUseCase = GetProductListUseCase(productRepository)
 
     @Test
-    fun testGetProductList() = runTest {
-        getProductListUseCase()
-        coVerify { productRepository.getAllProducts() }
-    }
+    fun testGetProductList() =
+        runTest {
+            getProductListUseCase()
+            coVerify { productRepository.getAllProducts() }
+        }
 }

@@ -10,37 +10,53 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val getProductList: GetProductListUseCase,
-    private val getProductById: GetProductByIdUseCase,
-) : ViewModel() {
+class HomeViewModel
+    @Inject
+    constructor(
+        private val getProductList: GetProductListUseCase,
+        private val getProductById: GetProductByIdUseCase,
+    ) : ViewModel() {
+        fun add(
+            a: Int,
+            b: Int,
+        ): Int = a + b
 
-    fun add(a: Int, b: Int): Int = a + b
-    fun subtract(a: Int, b: Int): Int = a - b
-    fun div(a: Int, b: Int): Int = a / b
-    fun multi(a: Int, b: Int): Int = a * b
+        fun subtract(
+            a: Int,
+            b: Int,
+        ): Int = a - b
 
-    init {
-        viewModelScope.launch {
-            with(getProductList()) {
-                when (this) {
-                    is ApiResponse.ApiError -> {
-                        println("ApiError $this")
-                    }
+        fun div(
+            a: Int,
+            b: Int,
+        ): Int = a / b
 
-                    is ApiResponse.NetworkError -> {
-                        println("ApiError $this")
-                    }
+        fun multi(
+            a: Int,
+            b: Int,
+        ): Int = a * b
 
-                    is ApiResponse.Success<*> -> {
-                        println("ApiError $this")
-                    }
+        init {
+            viewModelScope.launch {
+                with(getProductList()) {
+                    when (this) {
+                        is ApiResponse.ApiError -> {
+                            println("ApiError $this")
+                        }
 
-                    is ApiResponse.UnknownError -> {
-                        println("ApiError $this")
+                        is ApiResponse.NetworkError -> {
+                            println("ApiError $this")
+                        }
+
+                        is ApiResponse.Success<*> -> {
+                            println("ApiError $this")
+                        }
+
+                        is ApiResponse.UnknownError -> {
+                            println("ApiError $this")
+                        }
                     }
                 }
             }
         }
     }
-}

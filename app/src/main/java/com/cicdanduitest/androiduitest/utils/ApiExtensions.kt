@@ -4,8 +4,8 @@ import com.cicdanduitest.androiduitest.models.ApiResponse
 import retrofit2.Response
 import java.io.IOException
 
-suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): ApiResponse<T> {
-    return try {
+suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): ApiResponse<T> =
+    try {
         val response = apiCall()
         if (response.isSuccessful) {
             val body = response.body()
@@ -23,4 +23,3 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): ApiResponse<T> 
     } catch (e: Exception) {
         ApiResponse.UnknownError(e)
     }
-}

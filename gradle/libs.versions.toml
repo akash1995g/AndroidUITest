@@ -9,9 +9,6 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 retrofit = "2.11.0"
-sl = "6.19.0"
-kk = "0.6.1"
-sq = "5.0.0.4638"
 dhilt = "2.51.1"
 hiltAndroid = "2.51.1"
 hiltAndroidCompiler = "2.51.1"
@@ -43,7 +40,4 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-spotless = { id = "com.diffplug.spotless", version.ref = "sl" }
-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kk" }
-sonarqube = { id = "org.sonarqube", version.ref = "sq" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "dhilt" }

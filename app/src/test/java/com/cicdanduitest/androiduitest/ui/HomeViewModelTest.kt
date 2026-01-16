@@ -4,10 +4,11 @@ import io.mockk.mockk
 import org.junit.Test
 
 class HomeViewModelTest {
-    private val viewModel = HomeViewModel(
-        getProductList = mockk(),
-        getProductById = mockk(),
-    )
+    private val viewModel =
+        HomeViewModel(
+            getProductList = mockk(),
+            getProductById = mockk(),
+        )
 
     @Test
     fun testAdd() {
