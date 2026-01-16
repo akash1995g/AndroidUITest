@@ -7,7 +7,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.spotless)
     alias(libs.plugins.sonarqube)
+    id("kotlin-kapt")
     alias(libs.plugins.kover)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -66,6 +68,25 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+
+    // hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+    implementation(libs.retrofit)
+    // gson converter
+    implementation(libs.converter.gson)
+
+    testImplementation("io.mockk:mockk:1.13.10")        // MockK for mocking
+    testImplementation("com.google.truth:truth:1.4.2")   // Google Truth for assertions
+    testImplementation("junit:junit:4.13.2")             // JUnit 4
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+    // (Optional) For Android instrumentation tests
+    androidTestImplementation("io.mockk:mockk-android:1.13.10")
+    androidTestImplementation("com.google.truth:truth:1.4.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
 spotless {
