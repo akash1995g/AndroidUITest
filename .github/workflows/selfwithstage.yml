@@ -12,6 +12,8 @@ on:
     secrets:
       SONAR_TOKEN: # Declare secrets you will use in the steps
         required: true
+      MY_GITHUB_TOKEN:
+        required: false
 
 # self-hosted
 # ubuntu-latest
@@ -40,6 +42,9 @@ jobs:
 
       - name: Run Spotless
         run: ./gradlew spotlessCheck
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.actor }}
 
   build:
     runs-on: ${{ inputs.runner }}
