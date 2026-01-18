@@ -5,9 +5,9 @@ import com.cicdanduitest.androiduitest.models.ProductsItem
 import javax.inject.Inject
 
 class GetProductListUseCase
-    @Inject
-    constructor(
-        private val productRepository: ProductRepository,
-    ) {
-        suspend operator fun invoke(): ApiResponse<List<ProductsItem>> = productRepository.getAllProducts()
-    }
+@Inject
+constructor(
+    private val productRepository: ProductRepository,
+) {
+    suspend operator fun invoke(): ApiResponse<List<ProductsItem>> = productRepository.getAllProducts()
+}

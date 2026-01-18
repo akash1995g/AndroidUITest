@@ -10,9 +10,8 @@ class GetProductByIdUseCaseTest {
     private val getProductByIdUseCase = GetProductByIdUseCase(productRepository)
 
     @Test
-    fun testGetProductById() =
-        runTest {
-            getProductByIdUseCase()
-            coVerify { productRepository.getProductById() }
-        }
+    fun testGetProductById() = runTest {
+        getProductByIdUseCase()
+        coVerify { productRepository.getProductById() }
+    }
 }

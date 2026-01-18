@@ -8,55 +8,36 @@ import org.junit.Rule
 import org.junit.Test
 
 class HomeScreenKtTest {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+    @get:Rule val composeTestRule = createComposeRule()
 
     @Test
     fun incrementButton_increasesCounter() {
-        composeTestRule.setContent {
-            CounterApp()
-        }
+        composeTestRule.setContent { CounterApp() }
 
         // Check initial state
-        composeTestRule
-            .onNodeWithTag("counterText")
-            .assertTextEquals("Count: 0")
+        composeTestRule.onNodeWithTag("counterText").assertTextEquals("Count: 0")
 
         // Perform click
-        composeTestRule
-            .onNodeWithTag("incrementButton")
-            .performClick()
+        composeTestRule.onNodeWithTag("incrementButton").performClick()
 
         // Check updated state
-        composeTestRule
-            .onNodeWithTag("counterText")
-            .assertTextEquals("Count: 1")
+        composeTestRule.onNodeWithTag("counterText").assertTextEquals("Count: 1")
     }
 
     @Test
     fun decrementButton_decreasesCounter() {
-        composeTestRule.setContent {
-            CounterApp()
-        }
+        composeTestRule.setContent { CounterApp() }
 
         // Perform click
-        composeTestRule
-            .onNodeWithTag("incrementButton")
-            .performClick()
+        composeTestRule.onNodeWithTag("incrementButton").performClick()
 
         // Check updated state
-        composeTestRule
-            .onNodeWithTag("counterText")
-            .assertTextEquals("Count: 1")
+        composeTestRule.onNodeWithTag("counterText").assertTextEquals("Count: 1")
 
         // Perform click
-        composeTestRule
-            .onNodeWithTag("decrementButton")
-            .performClick()
+        composeTestRule.onNodeWithTag("decrementButton").performClick()
 
         // Check updated state
-        composeTestRule
-            .onNodeWithTag("counterText")
-            .assertTextEquals("Count: 0")
+        composeTestRule.onNodeWithTag("counterText").assertTextEquals("Count: 0")
     }
 }

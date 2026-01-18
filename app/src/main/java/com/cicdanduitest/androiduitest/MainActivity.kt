@@ -23,9 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidUITestTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(modifier = Modifier.padding(innerPadding)) {
-                        HomeScreen()
-                    }
+                    Column(modifier = Modifier.padding(innerPadding)) { HomeScreen() }
                 }
             }
         }
@@ -35,7 +33,5 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    AndroidUITestTheme {
-        HomeScreen()
-    }
+    AndroidUITestTheme { HomeScreen() }
 }

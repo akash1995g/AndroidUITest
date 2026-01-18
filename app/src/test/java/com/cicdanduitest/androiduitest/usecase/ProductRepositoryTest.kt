@@ -26,22 +26,20 @@ class ProductRepositoryTest {
         )
 
     @Test
-    fun testGetAllProducts() =
-        runTest {
-            coEvery { productApiService.getAllProducts() } returns
-                success(
-                    listOf(productsItem),
-                )
-            val result = productRepository.getAllProducts()
-            coEvery { productApiService.getAllProducts() } returns success(emptyList())
-            assertThat(result).isEqualTo(ApiResponse.Success(data = listOf<ProductsItem>(productsItem)))
-        }
+    fun testGetAllProducts() = runTest {
+        coEvery { productApiService.getAllProducts() } returns
+            success(
+                listOf(productsItem),
+            )
+        val result = productRepository.getAllProducts()
+        coEvery { productApiService.getAllProducts() } returns success(emptyList())
+        assertThat(result).isEqualTo(ApiResponse.Success(data = listOf<ProductsItem>(productsItem)))
+    }
 
     @Test
-    fun testGetProductById() =
-        runTest {
-            coEvery { productApiService.getProductById() } returns success(productsItem)
-            val result = productRepository.getProductById()
-            assertThat(result).isEqualTo(ApiResponse.Success(data = productsItem))
-        }
+    fun testGetProductById() = runTest {
+        coEvery { productApiService.getProductById() } returns success(productsItem)
+        val result = productRepository.getProductById()
+        assertThat(result).isEqualTo(ApiResponse.Success(data = productsItem))
+    }
 }

@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
-    id("com.baga.androidapp.androiddevelopmentteam.build_logic.quality") version "1.0.2"
+    id("com.baga.androidapp.androiddevelopmentteam.build_logic.quality")
 }
 
 android {
@@ -21,7 +21,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -145,9 +144,8 @@ quality {
         // Fetch the current Git branch name for community edition
         val branchName = System.getenv("CURRENT_BRANCH") ?: getCurrentGitBranch()
         this.sonarBranchName = branchName
-
     }
 
-    this.koverConfigs =
-        KoverDetails.Builder().setExcludedClasses(listOf("*Fragment*", "*Activity*")).build()
+    this.koverConfigs = KoverDetails.Builder()
+        .setExcludedClasses(listOf("*Fragment*", "*Activity*")).build()
 }

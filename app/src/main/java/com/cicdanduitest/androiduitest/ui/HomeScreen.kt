@@ -21,7 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
-//    val viewModel: HomeViewModel = viewModel()
+    //    val viewModel: HomeViewModel = viewModel()
     CounterApp()
 }
 
@@ -30,17 +30,13 @@ fun CounterApp() {
     var count by remember { mutableIntStateOf(0) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Count: $count",
-            modifier = Modifier
-                .testTag("counterText")
-                .padding(bottom = 16.dp),
+            modifier = Modifier.testTag("counterText").padding(bottom = 16.dp),
             style = MaterialTheme.typography.headlineMedium,
         )
 
