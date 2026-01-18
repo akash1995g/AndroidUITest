@@ -11,15 +11,17 @@ pluginManagement {
         gradlePluginPortal()
         maven {
             url = uri("https://maven.pkg.github.com/akash1995g/AndroidLibrary")
-            val localProps = java.util.Properties().apply {
-                val file = rootDir.resolve("local.properties")
-                if (file.exists()) {
-                    load(file.inputStream())
-                }
-            }
+            fun getKeyFromFile(key: String, fileName: String = "local.properties"): String =
+                System.getenv(key)
+                    ?: run {
+                        val file = rootDir.resolve(fileName)
+                        if (!file.exists()) "" else java.util.Properties().apply {
+                            file.inputStream().use { load(it) }
+                        }.getProperty(key, "")
+                    }
             credentials {
-                username = localProps.getProperty("GITHUB_USER") ?: ""
-                password = localProps.getProperty("GITHUB_TOKEN") ?: ""
+                username = getKeyFromFile("GITHUB_USER")
+                password = getKeyFromFile("GITHUB_TOKEN")
             }
         }
         mavenLocal()
@@ -32,15 +34,17 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://maven.pkg.github.com/akash1995g/AndroidLibrary")
-            val localProps = java.util.Properties().apply {
-                val file = rootDir.resolve("local.properties")
-                if (file.exists()) {
-                    load(file.inputStream())
-                }
-            }
+            fun getKeyFromFile(key: String, fileName: String = "local.properties"): String =
+                System.getenv(key)
+                    ?: run {
+                        val file = rootDir.resolve(fileName)
+                        if (!file.exists()) "" else java.util.Properties().apply {
+                            file.inputStream().use { load(it) }
+                        }.getProperty(key, "")
+                    }
             credentials {
-                username = localProps.getProperty("GITHUB_USER") ?: ""
-                password = localProps.getProperty("GITHUB_TOKEN") ?: ""
+                username = getKeyFromFile("GITHUB_USER")
+                password = getKeyFromFile("GITHUB_TOKEN")
             }
         }
     }
