@@ -33,5 +33,6 @@ dependencyResolutionManagement {
     }
 }
 
+
 rootProject.name = "AndroidUITest"
 include(":app")
