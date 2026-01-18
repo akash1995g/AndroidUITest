@@ -73,6 +73,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           CURRENT_BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.actor }}
         run: ./gradlew unitTestCoverage
 
   assemble:
