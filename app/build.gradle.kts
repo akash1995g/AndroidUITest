@@ -75,16 +75,16 @@ dependencies {
     // gson converter
     implementation(libs.converter.gson)
 
-    testImplementation("io.mockk:mockk:1.13.10")        // MockK for mocking
-    testImplementation("com.google.truth:truth:1.4.2")   // Google Truth for assertions
-    testImplementation("junit:junit:4.13.2")             // JUnit 4
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation(libs.mockk)        // MockK for mocking
+    testImplementation(libs.truth)   // Google Truth for assertions
+    testImplementation(libs.junit)             // JUnit 4
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // (Optional) For Android instrumentation tests
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-    androidTestImplementation("com.google.truth:truth:1.4.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
 
 fun Project.getLocalProperty(key: String, file: String = "local.properties"): String {
