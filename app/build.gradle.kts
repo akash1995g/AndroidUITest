@@ -1,6 +1,6 @@
 import com.baga.androidapp.androiddevelopmentteam.build_logic.quality.KoverDetails
 import java.util.Properties
-import java.io.ByteArrayOutputStream
+import java.io.BufferedReader
 
 plugins {
     alias(libs.plugins.android.application)
@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.cicdanduitest.androiduitest"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.cicdanduitest.androiduitest"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -94,15 +94,23 @@ fun Project.getLocalProperty(key: String, file: String = "local.properties"): St
 }
 
 fun getCurrentGitBranch(): String {
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-        standardOutput = stdout
+    val process = ProcessBuilder(
+        "git", "rev-parse", "--abbrev-ref", "HEAD"
+    )
+        .redirectErrorStream(true)
+        .start()
+
+    val output = process.inputStream.bufferedReader().use(BufferedReader::readText)
+
+    val exitCode = process.waitFor()
+    if (exitCode != 0) {
+        throw IllegalStateException("Failed to get git branch (exit code=$exitCode)")
     }
-    return stdout.toString().trim()
+
+    return output.trim()
 }
 
-task("codeCheck") {
+tasks.register("codeCheck") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
@@ -116,7 +124,7 @@ task("codeCheck") {
 }
 
 
-task("unitTestCoverage") {
+tasks.register("unitTestCoverage") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
