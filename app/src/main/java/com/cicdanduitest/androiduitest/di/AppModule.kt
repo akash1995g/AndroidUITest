@@ -12,17 +12,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-    private val BASE_URL = "https://fakestoreapi.com/"
+    private val baseUrl = "https://fakestoreapi.com/"
 
     @Provides
-    fun getInstance(): Retrofit {
-        return Retrofit.Builder().baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    fun getInstance(): Retrofit = Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create()).build()
 
     @Provides
-    fun provideApiService(retrofit: Retrofit): ProductApiService {
-        return retrofit.create(ProductApiService::class.java)
-    }
+    fun provideApiService(retrofit: Retrofit): ProductApiService = retrofit.create(ProductApiService::class.java)
 }
