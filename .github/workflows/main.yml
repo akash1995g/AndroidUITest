@@ -32,6 +32,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  labels:
+    uses: ./.github/workflows/create-multiple-labels.yml
+    with:
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || 'ubuntu-latest' }}
+      create_labels: ${{ inputs.create_labels }}
+      delete_labels: ${{ inputs.delete_labels }}
+
   # This job is responsible for selecting the appropriate runner type.
   # It checks the event name and, based on it, decides which runner to use.
   # - For 'workflow_dispatch' events, it uses the 'runner_type' input.
@@ -54,9 +62,4 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
-  labels:
-    uses: ./.github/workflows/create-multiple-labels.yml
-    with:
-      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || 'ubuntu-latest' }}
-      create_labels: ${{ inputs.create_labels }}
-      delete_labels: ${{ inputs.delete_labels }}
+
