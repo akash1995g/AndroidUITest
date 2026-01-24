@@ -20,6 +20,12 @@ on:
           - none
           - self
           - lib
+      create_labels:
+        required: false
+        default: true
+      delete_labels:
+          required: false
+          default: false
   push:
     branches:
       - main
