@@ -99,13 +99,13 @@ jobs:
 #      PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
       MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN  }}
 
-  labels:
-    uses: akash1995g/workflow/.github/workflows/create-multiple-labels.yml@main
-    with:
-      runner: ${{
-        github.event_name == 'workflow_dispatch' && inputs.runner_type ||
-        (github.event_name == 'pull_request' || github.event_name == 'push') &&
-        (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted')
-        }}
-      create_labels: ${{ inputs.create_labels }}
-      delete_labels: ${{ inputs.delete_labels }}
+#  labels:
+#    uses: akash1995g/workflow/.github/workflows/create-multiple-labels.yml@main
+#    with:
+#      runner: ${{
+#        github.event_name == 'workflow_dispatch' && inputs.runner_type ||
+#        (github.event_name == 'pull_request' || github.event_name == 'push') &&
+#        (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted')
+#        }}
+#      create_labels: ${{ inputs.create_labels }}
+#      delete_labels: ${{ inputs.delete_labels }}
