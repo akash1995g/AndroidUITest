@@ -38,18 +38,6 @@ jobs:
   # - For 'pull_request' or 'push' events, it checks for the 'Self-hosted' label.
   #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
   # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
-  prepare-workflows:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download private reusable workflows
-        run: ./gradlew downloadReusableWorkflows
-        env:
-          GH_WORKFLOW_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-
 
   select-runner:
     needs: prepare-workflows
