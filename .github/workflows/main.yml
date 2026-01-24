@@ -20,12 +20,16 @@ on:
           - none
           - self
           - lib
+      # Create labels for repo
       create_labels:
-        required: false
+        description: '🏷️ Labels → Create labels'
+        type: boolean
         default: true
+
       delete_labels:
-          required: false
-          default: false
+        description: '🏷️ Labels → Delete labels'
+        type: boolean
+        default: false
   push:
     branches:
       - main
