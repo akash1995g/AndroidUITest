@@ -1,10 +1,10 @@
-name: Android Build Test
+name: Android Build Workflow V1
 
 on:
   workflow_dispatch:
     inputs:
       runner_type:
-        description: 'Select runner type'
+        description: '🖥️ Runner → Select runner type'
         required: true
         default: 'ubuntu-latest'
         type: choice
@@ -12,7 +12,7 @@ on:
           - ubuntu-latest
           - self-hosted
       ui_test:
-        description: 'Select UI test runner'
+        description: '📱 UI Test → Select UI test runner'
         required: true
         default: 'none'
         type: choice
@@ -20,34 +20,92 @@ on:
           - none
           - self
           - lib
+      release:
+        description: '🚀 Release → Select release type'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - production
+          - beta
+          - alpha
+          - internal
+      skip_sonar:
+        description: '🔍 Sonar → Skip SonarQube analysis'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      device-ip:
+        type: string
+        description: '📡 Device → Android device IP'
+
+      # Create labels for repo
+      create_labels:
+        description: '🏷️ Labels → Create labels'
+        type: boolean
+        default: false
+
+      delete_labels:
+        description: '🏷️ Labels → Delete labels'
+        type: boolean
+        default: false
+
   push:
     branches:
       - main
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
     branches:
       - main
-
+      - dev
+      - feature/update
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # This job is responsible for selecting the appropriate runner type.
-  # It checks the event name and, based on it, decides which runner to use.
-  # - For 'workflow_dispatch' events, it uses the 'runner_type' input.
-  # - For 'pull_request' or 'push' events, it checks for the 'Self-hosted' label.
-  #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
-  # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
   select-runner:
     if: ${{ (github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop')) || github.event_name == 'workflow_dispatch' }}
-    uses: ./.github/workflows/selfwithstage.yml
+    #uses: ./.github/workflows/selfwithstage.yml
+    uses: akash1995g/workflow/.github/workflows/selfwithstage.yml@main
     with:
       runner: ${{
         github.event_name == 'workflow_dispatch' && inputs.runner_type ||
         (github.event_name == 'pull_request' || github.event_name == 'push') &&
-        (contains(github.event.pull_request.labels.*.name, 'Self-hosted') && 'self-hosted' || 'ubuntu-latest')
+        (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted')
         }}
       ui_test: ${{ inputs.ui_test || 'none' }}
+      release_type: ${{ inputs.release || 'none' }}
+      skip_sonar: ${{
+        (github.event_name == 'workflow_dispatch' && inputs.skip_sonar == 'true') ||
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'Skip-Sonar'))
+        }}
+      package_name: com.androidapp.anywifirouter
+      device-ip: ${{  inputs.device-ip  }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+#      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+#      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+#      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+#      PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+      MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN  }}
+
+  labels:
+    uses: akash1995g/workflow/.github/workflows/create-multiple-labels.yml@main
+    with:
+      runner: ${{
+        github.event_name == 'workflow_dispatch' && inputs.runner_type ||
+        (github.event_name == 'pull_request' || github.event_name == 'push') &&
+        (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted')
+        }}
+      create_labels: ${{ inputs.create_labels }}
+      delete_labels: ${{ inputs.delete_labels }}
