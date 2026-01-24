@@ -34,7 +34,7 @@ on:
       skip_sonar:
         description: '🔍 Sonar → Skip SonarQube analysis'
         required: false
-        default: 'false'
+        default: 'true'
         type: choice
         options:
           - 'true'
