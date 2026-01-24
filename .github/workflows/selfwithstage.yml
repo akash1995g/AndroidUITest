@@ -9,9 +9,29 @@ on:
       ui_test:
         required: true
         type: string
+      release_type:
+        required: true
+        type: string
+      package_name:
+        required: true
+        type: string
+      skip_sonar:
+        required: false
+        type: boolean
+      device-ip:
+        type: string
+        description: "IP address of the Android device to connect"
     secrets:
       SONAR_TOKEN: # Declare secrets you will use in the steps
-        required: true
+        required: false
+      KEYSTORE_PASSWORD:
+        required: false
+      KEY_ALIAS:
+        required: false
+      KEY_PASSWORD:
+        required: false
+      PLAY_STORE_SERVICE_ACCOUNT_JSON:
+        required: false
       MY_GITHUB_TOKEN:
         required: false
 
@@ -46,25 +66,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           GITHUB_USER: ${{ github.actor }}
 
-  build:
-    runs-on: ${{ inputs.runner }}
-    needs: spotless
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Android Environment Setup
-        uses: ./.github/actions/android-setup
-
-      - name: Build with Gradle
-        run: ./gradlew build
-
   unit-test:
     runs-on: ${{ inputs.runner }}
     needs: spotless
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
@@ -75,34 +84,91 @@ jobs:
           CURRENT_BRANCH: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           GITHUB_USER: ${{ github.actor }}
-        run: ./gradlew unitTestCoverage
+        run: |
+          if [ "${{ inputs.skip_sonar }}" = "true" ]; then
+            echo "Skipping SonarQube... Running sonarCheck"
+            ./gradlew codeCheck
+          else
+            echo "Running sonarCheck (includes coverage, formatting, etc.)"
+            ./gradlew sonarCheck
+          fi
 
-  assemble:
-    runs-on: ${{ inputs.runner }}
-    needs: [ build, unit-test, ui-test, ui-test-2 ]
-    if: ${{ always() && needs.build.result == 'success' && needs.unit-test.result == 'success' && (needs.ui-test.result == 'success' || needs.ui-test.result == 'skipped') && (needs.ui-test-2.result == 'success' || needs.ui-test-2.result == 'skipped') }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # --- NEW STEPS BELOW ---
 
-      - name: Android Environment Setup
-        uses: ./.github/actions/android-setup
+      - name: Generate Kover XML report
+        env:
+          DIFF_TARGET_BRANCH: "origin/${{ github.base_ref }}"
+        run: ./gradlew koverXmlReport
 
-      - name: Build APK
-        run: ./gradlew assembleRelease
+      - name: Extract Kover coverage details
+        id: kover
+        run: |
+          FILE="app/build/reports/kover/report.xml"
+          if [ ! -f "$FILE" ]; then
+            echo "No Kover report found!"
+            exit 0
+          fi
+
+          echo "📊 Parsing Kover report: $FILE"
+          echo "----------------------------------------"
+
+          TYPES=$(grep -oP '(?<=<counter type=")[A-Z]+' "$FILE" | sort | uniq)
+          declare -A COVERAGE_MAP
+          DETAILS=""
+
+          for TYPE in $TYPES; do
+            MISSED=$(grep "<counter type=\"$TYPE\"" "$FILE" | grep -oP 'missed="\K[0-9]+' | awk '{s+=$1} END {print s}')
+            COVERED=$(grep "<counter type=\"$TYPE\"" "$FILE" | grep -oP 'covered="\K[0-9]+' | awk '{s+=$1} END {print s}')
+            TOTAL=$((MISSED + COVERED))
+            if [ "$TOTAL" -eq 0 ]; then
+              PERCENT=0
+            else
+              PERCENT=$((COVERED * 100 / TOTAL))
+            fi
+
+            COVERAGE_MAP[$TYPE]=$PERCENT
+            DETAILS+="$TYPE: ${PERCENT}% (missed=$MISSED, covered=$COVERED, total=$TOTAL)\n"
+          done
+
+          echo "----------------------------------------"
+          echo -e "$DETAILS"
+          echo "✅ Overall LINE Coverage: ${COVERAGE_MAP[LINE]}%"
+
+          # Export outputs for later steps
+          echo "coverage=${COVERAGE_MAP[LINE]}" >> $GITHUB_OUTPUT
+          echo "details<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$DETAILS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment Kover coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: "📊 Code Coverage (Kover)"
+          message: |
+            ✅ **Overall LINE Coverage:** ${{ steps.kover.outputs.coverage }}%
+
+            <details>
+            <summary>View Detailed Coverage Breakdown</summary>
+
+            ```
+            ${{ steps.kover.outputs.details }}
+            ```
+            </details>
+  
 
   ui-test:
     runs-on: ${{ inputs.runner }}
-    if: ${{ 
-          (
-          github.event_name == 'pull_request' &&
-          !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
-          !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
-          ) || (
-          github.event_name == 'workflow_dispatch' &&
-          (github.event.inputs.ui_test == 'lib')
-          )
-        }}
+    if: ${{
+      (
+      github.event_name == 'pull_request' &&
+      !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
+      !contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
+      ) || (
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.ui_test == 'lib')
+      )
+      }}
     strategy:
       matrix:
         api-level: [ 33 ]  # <-- Customize API levels here!
@@ -117,19 +183,19 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
-          package: com.cicdanduitest.androiduitest
+          package: ${{inputs.package_name}}
 
-  ui-test-2:
+  ui-test-self:
     runs-on: ${{ inputs.runner }}
     if: ${{
-          (
-          github.event_name == 'pull_request' &&
-          !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
-          contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
-          ) || (
-          github.event_name == 'workflow_dispatch' &&
-          (github.event.inputs.ui_test == 'self')
-          )
+      (
+      github.event_name == 'pull_request' &&
+      !contains(github.event.pull_request.labels.*.name, 'Skip-UI-Test') &&
+      contains(github.event.pull_request.labels.*.name, 'Custom Emulator')
+      ) || (
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.ui_test == 'self')
+      )
       }}
     strategy:
       matrix:
@@ -145,18 +211,76 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
-          package: com.cicdanduitest.androiduitest
+          package: ${{inputs.package_name}}
+
+  assemble:
+    runs-on: ${{ inputs.runner }}
+    needs: [ unit-test, ui-test, ui-test-self ]
+    if: ${{
+      (needs.unit-test.result == 'success') &&
+      (needs.ui-test.result == 'success' || needs.ui-test.result == 'skipped') &&
+      (needs.ui-test-self.result == 'success' || needs.ui-test-self.result == 'skipped')
+      }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Android Environment Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.actor }}
+        run: ./gradlew bundleRelease assembleRelease
+
+      - name: Upload APK
+        if: ${{ inputs.release_type != 'none' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-app-build
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 1
+      - name: Upload AAB
+        if: ${{ inputs.release_type != 'none' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-abb-build
+          path: app/build/outputs/bundle/release/app-release.aab
+          retention-days: 1
+
+      - name: Upload ${{ inputs.release_type }} Build to Google Play
+        if: ${{ inputs.release_type != 'none' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ inputs.package_name }}
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.release_type }}
+
+  ui-test-physical:
+    runs-on: ${{ inputs.runner }}
+    if: ${{
+      inputs.device-ip != '' && inputs.runner == 'self-hosted' &&
+      (
+      github.event_name == 'pull_request' ||
+      github.event_name == 'workflow_dispatch'
+      )
+      }}
+    needs: spotless
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Emulator Environment Setup
+        uses: ./.github/actions/physical-device
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          package: ${{ inputs.package_name}}
+          device-ip: ${{ inputs.device-ip }}
 
 
-#      # Upload the APK as an artifact using the latest version 4
-#      - name: Upload APK
-#        uses: actions/upload-artifact@v4  # Updated to v3.1.0
-#        with:
-#          name: release-app-build
-#          path: app/build/outputs/apk/release/app-release.apk
-#      # Upload the APK as an artifact using the latest version 4
-#      - name: Upload Unsigned APK
-#        uses: actions/upload-artifact@v4  # Updated to v3.1.0
-#        with:
-#          name: unsigned-build
-#          path: app/build/outputs/apk/release/app-release-unsigned.apk
