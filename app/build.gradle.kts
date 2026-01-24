@@ -157,3 +157,48 @@ quality {
     this.koverConfigs = KoverDetails.Builder()
         .setExcludedClasses(listOf("*Fragment*", "*Activity*")).build()
 }
+
+tasks.register("downloadReusableWorkflows") {
+    group = "ci"
+    description = "Download reusable GitHub workflows from private repo"
+
+    doLast {
+        val token = System.getenv("MY_GITHUB_TOKEN")
+            ?: error("MY_GITHUB_TOKEN env var not set")
+
+        val workflows = listOf(
+            "selfwithstage.yml",
+            "create-multiple-labels.yml"
+        )
+
+        val targetDir = file(".github/workflows")
+        targetDir.mkdirs()
+
+        workflows.forEach { fileName ->
+            val url = URL(
+                "https://api.github.com/repos/akash1995g/workflow/contents/.github/workflows/$fileName?ref=main"
+            )
+
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                setRequestProperty("Authorization", "Bearer $token")
+                setRequestProperty("Accept", "application/vnd.github.raw")
+            }
+
+            if (conn.responseCode != 200) {
+                error("Failed to download $fileName → HTTP ${conn.responseCode}")
+            }
+
+            val outFile = targetDir.resolve(fileName)
+            conn.inputStream.use { input ->
+                outFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            println("Downloaded workflow: $fileName")
+        }
+    }
+}
+
+
