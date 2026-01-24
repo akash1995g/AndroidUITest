@@ -180,7 +180,7 @@ tasks.register("downloadReusableWorkflows") {
 
         workflows.forEach { fileName ->
             val url = URL(
-                "https://api.github.com/repos/akash1995g/workflow/contents/.github/workflows/$fileName?ref=main"
+                "https://api.github.com/repos/akash1995g/workflow/contents/.github/workflows/$fileName?ref=dev"
             )
 
             val conn = (url.openConnection() as HttpURLConnection).apply {

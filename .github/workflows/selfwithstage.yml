@@ -11,6 +11,7 @@ on:
         type: string
       release_type:
         required: true
+        default: 'none'
         type: string
       package_name:
         required: true
