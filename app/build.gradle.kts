@@ -1,6 +1,8 @@
 import com.baga.androidapp.androiddevelopmentteam.build_logic.quality.KoverDetails
 import java.util.Properties
 import java.io.BufferedReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 plugins {
     alias(libs.plugins.android.application)
@@ -171,7 +173,9 @@ tasks.register("downloadReusableWorkflows") {
             "create-multiple-labels.yml"
         )
 
-        val targetDir = file(".github/workflows")
+        val targetDir = rootProject.rootDir
+            .resolve(".github")
+            .resolve("workflows")
         targetDir.mkdirs()
 
         workflows.forEach { fileName ->
