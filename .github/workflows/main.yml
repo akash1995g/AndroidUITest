@@ -36,7 +36,8 @@ jobs:
   labels:
     uses: ./.github/workflows/create-multiple-labels.yml
     with:
-      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || (github.event_name == 'pull_request' || github.event_name == 'push') && (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted') }}
+     # runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || (github.event_name == 'pull_request' || github.event_name == 'push') && (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted') }}
+      runner: 'self-hosted'
       create_labels: ${{ inputs.create_labels }}
       delete_labels: ${{ inputs.delete_labels }}
 
