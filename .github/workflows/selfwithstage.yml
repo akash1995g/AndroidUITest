@@ -10,7 +10,7 @@ on:
         required: true
         type: string
       release_type:
-        required: true
+        required: false
         default: 'none'
         type: string
       package_name:
