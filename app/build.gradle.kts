@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.build.logic)
     alias(libs.plugins.sonar.config)
-    id("io.github.takahirom.roborazzi")
+    alias(libs.plugins.roborazzi)
 }
 
 android {

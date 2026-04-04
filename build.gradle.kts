@@ -6,5 +6,6 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.build.logic) apply false
     alias(libs.plugins.sonar.config) apply false
-    id("io.github.takahirom.roborazzi") version "1.59.0" apply false
+    alias(libs.plugins.roborazzi) apply false
+
 }

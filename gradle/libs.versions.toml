@@ -19,6 +19,7 @@ truth = "1.4.5"
 build_logic_quality = "1.0.2"
 ksp = "2.2.20-2.0.3"
 sonar = "1.0.1"
+roborazzi = "1.59.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,3 +55,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "dhilt" }
 build-logic = { id = "com.baga.androidapp.androiddevelopmentteam.build_logic", version.ref = "build_logic_quality" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 sonar-config = { id = "com.baga.androidapp.androiddevelopmentteam.sonarqube.config", version.ref = "sonar" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
