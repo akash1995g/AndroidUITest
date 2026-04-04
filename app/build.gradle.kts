@@ -1,14 +1,13 @@
 import com.baga.androidapp.androiddevelopmentteam.build_logic.conventions.kover.KoverDetails
-import java.util.Properties
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.hilt)
     alias(libs.plugins.build.logic)
     id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config")
@@ -16,7 +15,11 @@ plugins {
 
 android {
     namespace = "com.cicdanduitest.androiduitest"
-    compileSdk = 36
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.cicdanduitest.androiduitest"
@@ -40,9 +43,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    
     buildFeatures {
         compose = true
     }
@@ -72,7 +73,7 @@ dependencies {
 
     // hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.retrofit)
     // gson converter
