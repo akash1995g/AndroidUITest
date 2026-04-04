@@ -16,6 +16,7 @@ dhilt = "2.55"
 hiltAndroid = "2.55"
 hiltAndroidCompiler = "2.55"
 truth = "1.4.5"
+build_logic_quality = "1.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,3 +50,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "dhilt" }
+build-logic = { id = "com.baga.androidapp.androiddevelopmentteam.build_logic", version.ref = "build_logic_quality" }

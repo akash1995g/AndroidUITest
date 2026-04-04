@@ -1,4 +1,4 @@
-import com.baga.androidapp.androiddevelopmentteam.build_logic.quality.KoverDetails
+import com.baga.androidapp.androiddevelopmentteam.build_logic.conventions.kover.KoverDetails
 import java.util.Properties
 import java.io.BufferedReader
 import java.net.HttpURLConnection
@@ -10,7 +10,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
-    id("com.baga.androidapp.androiddevelopmentteam.build_logic.quality")
+    alias(libs.plugins.build.logic)
+    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config")
 }
 
 android {
@@ -139,26 +140,40 @@ tasks.register("unitTestCoverage") {
 }
 
 quality {
-    this.enableSpotless = false
-    this.enableSonar = true
-    this.sonarHostUrl = getLocalProperty("sonar.url", "config.properties")
-    this.sonarProjectKey = getLocalProperty("sonar.key", "config.properties")
-    this.sonarOrganization = getLocalProperty("sonar.organization", "config.properties")
-    this.sonarProjectName = getLocalProperty("sonar.name", "config.properties")
-    this.sonarToken =
+    enableSpotless = true
+    enableKover = true
+    koverConfigs = KoverDetails.Builder()
+        .setExcludedClasses(
+            listOf("*Fragment*", "*Activity*")
+        )
+        .build()
+}
+
+
+createGitWorkflow{
+    overWrite = true
+    addMain = false
+}
+
+
+sonarConfig {
+    enableSonar = true
+    sonarHostUrl = getLocalProperty("sonar.url", "config.properties")
+    sonarProjectKey = getLocalProperty("sonar.key", "config.properties")
+    sonarOrganization = getLocalProperty("sonar.organization", "config.properties")
+    sonarProjectName = getLocalProperty("sonar.name", "config.properties")
+    sonarToken =
         System.getenv("SONAR_TOKEN") ?: getLocalProperty("sonar.token", "config.properties")
-    this.sonarXmlReportPaths = "${project.buildDir}/reports/kover/xml/report.xml"
-    this.sonarExclusions = "**/*Fragment.kt, **/*Activity*,**/ui/theme/*.kt"
-    val url: String = getLocalProperty("sonar.url", "config.properties").toString()
+    sonarXmlReportPaths = "${project.buildDir}/reports/kover/xml/report.xml"
+    sonarExclusions = "**/*Fragment.kt, **/*Activity*,**/ui/theme/*.kt"
+    val url: String = getLocalProperty("sonar.url", "config.properties")
     if (!url.contains("https://sonarcloud.io")) {
         // Fetch the current Git branch name for community edition
         val branchName = System.getenv("CURRENT_BRANCH") ?: getCurrentGitBranch()
-        this.sonarBranchName = branchName
+        sonarBranchName = branchName
     }
-
-    this.koverConfigs = KoverDetails.Builder()
-        .setExcludedClasses(listOf("*Fragment*", "*Activity*")).build()
 }
+
 
 tasks.register("downloadReusableWorkflows") {
     group = "ci"

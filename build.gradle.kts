@@ -4,5 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
-    id("com.baga.androidapp.androiddevelopmentteam.build_logic.quality") version "1.0.6.1"
+    alias(libs.plugins.build.logic) apply false
+    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config") apply false version "1.0.1"
 }
