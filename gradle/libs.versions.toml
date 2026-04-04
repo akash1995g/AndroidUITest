@@ -17,6 +17,8 @@ hiltAndroid = "2.59.2"
 hiltAndroidCompiler = "2.59.2"
 truth = "1.4.5"
 build_logic_quality = "1.0.2"
+ksp = "2.2.20-2.0.3"
+sonar = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,7 +49,8 @@ truth = { module = "com.google.truth:truth", version.ref = "truth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "dhilt" }
 build-logic = { id = "com.baga.androidapp.androiddevelopmentteam.build_logic", version.ref = "build_logic_quality" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+sonar-config = { id = "com.baga.androidapp.androiddevelopmentteam.sonarqube.config", version.ref = "sonar" }

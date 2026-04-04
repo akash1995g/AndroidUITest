@@ -7,10 +7,11 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.build.logic)
-    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config")
+    alias(libs.plugins.sonar.config)
+    id("io.github.takahirom.roborazzi")
 }
 
 android {
@@ -89,6 +90,14 @@ dependencies {
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    testImplementation("io.github.takahirom.roborazzi:roborazzi:1.59.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.59.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-junit-rule:1.59.0")
+    testImplementation("org.robolectric:robolectric:4.16.1")
+
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
 fun Project.getLocalProperty(key: String, file: String = "local.properties"): String {
