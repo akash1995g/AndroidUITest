@@ -1,0 +1,115 @@
+name: Manage Repository Labels
+
+on:
+  workflow_call:
+    inputs:
+      create_labels:
+        description: "Create custom labels if not present"
+        required: false
+        default: false
+        type: boolean
+
+      delete_labels:
+        description: "Delete existing labels"
+        required: false
+        default: false
+        type: boolean
+        
+      runner:
+        required: true
+        type: string  
+
+  workflow_dispatch:
+    inputs:
+      create_labels:
+        description: "Create custom labels if not present"
+        type: boolean
+        default: true
+
+      delete_labels:
+        description: "Delete existing labels"
+        type: boolean
+        default: false   
+
+      runner:
+          required: true
+          default:  ubuntu-latest
+          type: string      
+
+jobs:
+  manage-labels:
+    runs-on: ${{ inputs.runner }}
+
+    steps:
+      - name: Fetch existing labels
+        id: existing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            const names = labels.data.map(l => l.name);
+            core.setOutput("labels", JSON.stringify(names));
+
+      - name: Delete labels (if enabled)
+        if: inputs.delete_labels == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            for (const label of labels.data) {
+              try {
+                await github.rest.issues.deleteLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name
+                });
+                console.log(`🗑️ Deleted label: ${label.name}`);
+              } catch (err) {
+                console.log(`⚠️ Failed to delete ${label.name}: ${err.message}`);
+              }
+            }
+
+      - name: Create custom labels (if enabled)
+        if: inputs.create_labels == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const existingLabels = JSON.parse(`${{ steps.existing.outputs.labels }}`);
+
+            const customLabels = [
+              { name: 'Custom Emulator', color: 'f9d0c4', description: 'Use custom Emulator' },
+              { name: 'Skip-UI-Test', color: 'fef2c0', description: "Don't run UI test" },
+              { name: 'Stop', color: 'e99695', description: "Don't trigger workflow" },
+              { name: 'Skip-Sonar', color: 'c5def5', description: 'Skip Sonar analysis' },
+              { name: 'Ubuntu-latest', color: 'c5def5', description: 'Run on GitHub runner' }
+            ];
+
+            for (const label of customLabels) {
+              if (existingLabels.includes(label.name)) {
+                console.log(`ℹ️ Label already exists: ${label.name}`);
+                continue;
+              }
+
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`✅ Created label: ${label.name}`);
+              } catch (err) {
+                console.log(`❌ Failed to create ${label.name}: ${err.message}`);
+              }
+            }

@@ -20,6 +20,16 @@ on:
           - none
           - self
           - lib
+      # Create labels for repo
+      create_labels:
+        description: '🏷️ Labels → Create labels'
+        type: boolean
+        default: true
+
+      delete_labels:
+        description: '🏷️ Labels → Delete labels'
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -32,12 +42,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  labels:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    uses: ./.github/workflows/create-multiple-labels.yml
+    with:
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || (github.event_name == 'pull_request' || github.event_name == 'push') && (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted') }}
+      create_labels: ${{ fromJSON(inputs.create_labels || 'false') }}
+      delete_labels: ${{ fromJSON(inputs.delete_labels || 'false') }}
+
   # This job is responsible for selecting the appropriate runner type.
   # It checks the event name and, based on it, decides which runner to use.
   # - For 'workflow_dispatch' events, it uses the 'runner_type' input.
   # - For 'pull_request' or 'push' events, it checks for the 'Self-hosted' label.
   #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
   # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
+
   select-runner:
     if: ${{ (github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop')) || github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/selfwithstage.yml
@@ -48,6 +68,9 @@ jobs:
         (contains(github.event.pull_request.labels.*.name, 'Self-hosted') && 'self-hosted' || 'ubuntu-latest')
         }}
       ui_test: ${{ inputs.ui_test || 'none' }}
+      package_name: "com.cicdanduitest.androiduitest"
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+
+

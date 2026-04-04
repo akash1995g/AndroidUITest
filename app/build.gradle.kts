@@ -1,24 +1,30 @@
-import com.baga.androidapp.androiddevelopmentteam.build_logic.quality.KoverDetails
+import com.baga.androidapp.androiddevelopmentteam.build_logic.conventions.kover.KoverDetails
+import java.io.BufferedReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Properties
-import java.io.ByteArrayOutputStream
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.hilt)
-    id("com.baga.androidapp.androiddevelopmentteam.build_logic.quality")
+    alias(libs.plugins.build.logic)
+    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config")
 }
 
 android {
     namespace = "com.cicdanduitest.androiduitest"
-    compileSdk = 35
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.cicdanduitest.androiduitest"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -37,9 +43,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    
     buildFeatures {
         compose = true
     }
@@ -69,22 +73,22 @@ dependencies {
 
     // hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.retrofit)
     // gson converter
     implementation(libs.converter.gson)
 
-    testImplementation("io.mockk:mockk:1.13.10")        // MockK for mocking
-    testImplementation("com.google.truth:truth:1.4.2")   // Google Truth for assertions
-    testImplementation("junit:junit:4.13.2")             // JUnit 4
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation(libs.mockk)        // MockK for mocking
+    testImplementation(libs.truth)   // Google Truth for assertions
+    testImplementation(libs.junit)             // JUnit 4
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // (Optional) For Android instrumentation tests
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-    androidTestImplementation("com.google.truth:truth:1.4.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
 
 fun Project.getLocalProperty(key: String, file: String = "local.properties"): String {
@@ -94,15 +98,23 @@ fun Project.getLocalProperty(key: String, file: String = "local.properties"): St
 }
 
 fun getCurrentGitBranch(): String {
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-        standardOutput = stdout
+    val process = ProcessBuilder(
+        "git", "rev-parse", "--abbrev-ref", "HEAD"
+    )
+        .redirectErrorStream(true)
+        .start()
+
+    val output = process.inputStream.bufferedReader().use(BufferedReader::readText)
+
+    val exitCode = process.waitFor()
+    if (exitCode != 0) {
+        throw IllegalStateException("Failed to get git branch (exit code=$exitCode)")
     }
-    return stdout.toString().trim()
+
+    return output.trim()
 }
 
-task("codeCheck") {
+tasks.register("codeCheck") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
@@ -116,7 +128,7 @@ task("codeCheck") {
 }
 
 
-task("unitTestCoverage") {
+tasks.register("unitTestCoverage") {
     group = "verification"
     description = "Generates the Kover XML report and then runs SonarQube analysis."
 
@@ -129,23 +141,84 @@ task("unitTestCoverage") {
 }
 
 quality {
-    this.enableSpotless = false
-    this.enableSonar = true
-    this.sonarHostUrl = getLocalProperty("sonar.url", "config.properties")
-    this.sonarProjectKey = getLocalProperty("sonar.key", "config.properties")
-    this.sonarOrganization = getLocalProperty("sonar.organization", "config.properties")
-    this.sonarProjectName = getLocalProperty("sonar.name", "config.properties")
-    this.sonarToken =
+    enableSpotless = true
+    enableKover = true
+    koverConfigs = KoverDetails.Builder()
+        .setExcludedClasses(
+            listOf("*Fragment*", "*Activity*")
+        )
+        .build()
+}
+
+
+createGitWorkflow{
+    overWrite = true
+    addMain = false
+}
+
+
+sonarConfig {
+    enableSonar = true
+    sonarHostUrl = getLocalProperty("sonar.url", "config.properties")
+    sonarProjectKey = getLocalProperty("sonar.key", "config.properties")
+    sonarOrganization = getLocalProperty("sonar.organization", "config.properties")
+    sonarProjectName = getLocalProperty("sonar.name", "config.properties")
+    sonarToken =
         System.getenv("SONAR_TOKEN") ?: getLocalProperty("sonar.token", "config.properties")
-    this.sonarXmlReportPaths = "${project.buildDir}/reports/kover/xml/report.xml"
-    this.sonarExclusions = "**/*Fragment.kt, **/*Activity*,**/ui/theme/*.kt"
-    val url: String = getLocalProperty("sonar.url", "config.properties").toString()
+    sonarXmlReportPaths = "${project.buildDir}/reports/kover/xml/report.xml"
+    sonarExclusions = "**/*Fragment.kt, **/*Activity*,**/ui/theme/*.kt"
+    val url: String = getLocalProperty("sonar.url", "config.properties")
     if (!url.contains("https://sonarcloud.io")) {
         // Fetch the current Git branch name for community edition
         val branchName = System.getenv("CURRENT_BRANCH") ?: getCurrentGitBranch()
-        this.sonarBranchName = branchName
+        sonarBranchName = branchName
     }
-
-    this.koverConfigs = KoverDetails.Builder()
-        .setExcludedClasses(listOf("*Fragment*", "*Activity*")).build()
 }
+
+
+tasks.register("downloadReusableWorkflows") {
+    group = "ci"
+    description = "Download reusable GitHub workflows from private repo"
+
+    doLast {
+        val token = System.getenv("MY_GITHUB_TOKEN")
+            ?: error("MY_GITHUB_TOKEN env var not set")
+
+        val workflows = listOf(
+            "selfwithstage.yml",
+            "create-multiple-labels.yml"
+        )
+
+        val targetDir = rootProject.rootDir
+            .resolve(".github")
+            .resolve("workflows")
+        targetDir.mkdirs()
+
+        workflows.forEach { fileName ->
+            val url = URL(
+                "https://api.github.com/repos/akash1995g/workflow/contents/.github/workflows/$fileName?ref=dev"
+            )
+
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                setRequestProperty("Authorization", "Bearer $token")
+                setRequestProperty("Accept", "application/vnd.github.raw")
+            }
+
+            if (conn.responseCode != 200) {
+                error("Failed to download $fileName → HTTP ${conn.responseCode}")
+            }
+
+            val outFile = targetDir.resolve(fileName)
+            conn.inputStream.use { input ->
+                outFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            println("Downloaded workflow: $fileName")
+        }
+    }
+}
+
+
