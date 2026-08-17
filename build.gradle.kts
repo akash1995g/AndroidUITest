@@ -5,5 +5,5 @@ plugins {
     id("com.google.devtools.ksp") version "2.2.20-2.0.3" apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.build.logic) apply false
-    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config") apply false version "1.0.1"
+    alias(libs.plugins.sonarqube.config) apply false
 }
