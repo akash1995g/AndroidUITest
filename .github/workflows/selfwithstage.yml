@@ -10,8 +10,7 @@ on:
         required: true
         type: string
       release_type:
-        required: false
-        default: 'none'
+        required: true
         type: string
       package_name:
         required: true
@@ -61,8 +60,14 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
+      - name: Download Maven Repo
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-repo
+          path: ${{ runner.temp }}/maven-repo
+
       - name: Run Spotless
-        run: ./gradlew spotlessCheck
+        run: ./gradlew spotlessCheck -Dmaven.repo.local=${{ runner.temp }}/maven-repo
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           GITHUB_USER: ${{ github.actor }}
@@ -79,6 +84,12 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
+      - name: Download Maven Repo
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-repo
+          path: ${{ runner.temp }}/maven-repo
+
       - name: Generate Code Coverage Report
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -88,10 +99,10 @@ jobs:
         run: |
           if [ "${{ inputs.skip_sonar }}" = "true" ]; then
             echo "Skipping SonarQube... Running sonarCheck"
-            ./gradlew codeCheck
+            ./gradlew codeCheck -Dmaven.repo.local=${{ runner.temp }}/maven-repo
           else
             echo "Running sonarCheck (includes coverage, formatting, etc.)"
-            ./gradlew sonarCheck
+            ./gradlew sonarCheck -Dmaven.repo.local=${{ runner.temp }}/maven-repo
           fi
 
       # --- NEW STEPS BELOW ---
@@ -99,7 +110,7 @@ jobs:
       - name: Generate Kover XML report
         env:
           DIFF_TARGET_BRANCH: "origin/${{ github.base_ref }}"
-        run: ./gradlew koverXmlReport
+        run: ./gradlew koverXmlReport -Dmaven.repo.local=${{ runner.temp }}/maven-repo
 
       - name: Extract Kover coverage details
         id: kover
@@ -156,6 +167,7 @@ jobs:
             ${{ steps.kover.outputs.details }}
             ```
             </details>
+  
   
 
   ui-test:
@@ -218,7 +230,7 @@ jobs:
     runs-on: ${{ inputs.runner }}
     needs: [ unit-test, ui-test, ui-test-self ]
     if: ${{
-      (needs.unit-test.result == 'success') &&
+      (needs.unit-test.result == 'success' || inputs.skip_sonar ) &&
       (needs.ui-test.result == 'success' || needs.ui-test.result == 'skipped') &&
       (needs.ui-test-self.result == 'success' || needs.ui-test-self.result == 'skipped')
       }}
@@ -229,6 +241,12 @@ jobs:
       - name: Android Environment Setup
         uses: ./.github/actions/android-setup
 
+      - name: Download Maven Repo
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-repo
+          path: ${{ runner.temp }}/maven-repo
+
       - name: Build APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -236,7 +254,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           GITHUB_USER: ${{ github.actor }}
-        run: ./gradlew bundleRelease assembleRelease
+        run: ./gradlew bundleRelease assembleRelease -Dmaven.repo.local=${{ runner.temp }}/maven-repo
 
       - name: Upload APK
         if: ${{ inputs.release_type != 'none' }}

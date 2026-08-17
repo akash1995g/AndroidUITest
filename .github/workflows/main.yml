@@ -1,10 +1,10 @@
-name: Android Build Test
+name: Android Build Workflow V1
 
 on:
   workflow_dispatch:
     inputs:
       runner_type:
-        description: 'Select runner type'
+        description: '🖥️ Runner → Select runner type'
         required: true
         default: 'ubuntu-latest'
         type: choice
@@ -12,7 +12,7 @@ on:
           - ubuntu-latest
           - self-hosted
       ui_test:
-        description: 'Select UI test runner'
+        description: '📱 UI Test → Select UI test runner'
         required: true
         default: 'none'
         type: choice
@@ -20,57 +20,125 @@ on:
           - none
           - self
           - lib
+      release:
+        description: '🚀 Release → Select release type'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - production
+          - beta
+          - alpha
+          - internal
+      skip_sonar:
+        description: '🔍 Sonar → Skip SonarQube analysis'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      device-ip:
+        type: string
+        description: '📡 Device → Android device IP'
+
       # Create labels for repo
       create_labels:
         description: '🏷️ Labels → Create labels'
         type: boolean
-        default: true
+        default: false
 
       delete_labels:
         description: '🏷️ Labels → Delete labels'
         type: boolean
         default: false
+
+      lib_branch:
+        type: string
+        description: 'Library Branch'
+
   push:
     branches:
       - main
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
     branches:
       - main
-
+      - dev
+      - feature/update
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Library-Branch: branch_name
+  prepare-library:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract library branch from PR
+        id: pr_branch
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+          BRANCH=$(echo "$BODY" | grep "Library-Branch:" | awk '{print $2}')
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-  labels:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    uses: ./.github/workflows/create-multiple-labels.yml
-    with:
-      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_type || (github.event_name == 'pull_request' || github.event_name == 'push') && (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted') }}
-      create_labels: ${{ fromJSON(inputs.create_labels || 'false') }}
-      delete_labels: ${{ fromJSON(inputs.delete_labels || 'false') }}
+      - name: Checkout Library
+        uses: actions/checkout@v4
+        with:
+          repository: akash1995g/AndroidLibrary
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          ref: ${{ inputs.lib_branch || steps.pr_branch.outputs.branch || 'main' }}
+          path: AndroidLibrary
 
-  # This job is responsible for selecting the appropriate runner type.
-  # It checks the event name and, based on it, decides which runner to use.
-  # - For 'workflow_dispatch' events, it uses the 'runner_type' input.
-  # - For 'pull_request' or 'push' events, it checks for the 'Self-hosted' label.
-  #   If the label exists, it uses 'self-hosted'; otherwise, it defaults to 'ubuntu-latest'.
-  # It also checks if the pull request has the 'Stop' label. if it has, it will skip this step
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Publish Library
+        working-directory: AndroidLibrary
+        run: |
+          ./gradlew publishToMavenLocal -Dmaven.repo.local=${{ runner.temp }}/maven-repo
+
+      - name: Upload Maven Repo
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-repo
+          path: ${{ runner.temp }}/maven-repo
+          retention-days: 1
 
   select-runner:
+    needs: [ prepare-library ]
     if: ${{ (github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'Stop')) || github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/selfwithstage.yml
+    #uses: akash1995g/workflow/.github/workflows/selfwithstage.yml@main
     with:
       runner: ${{
         github.event_name == 'workflow_dispatch' && inputs.runner_type ||
         (github.event_name == 'pull_request' || github.event_name == 'push') &&
-        (contains(github.event.pull_request.labels.*.name, 'Self-hosted') && 'self-hosted' || 'ubuntu-latest')
+        (contains(github.event.pull_request.labels.*.name, 'Ubuntu-latest') && 'ubuntu-latest' || 'self-hosted')
         }}
       ui_test: ${{ inputs.ui_test || 'none' }}
+      release_type: ${{ inputs.release || 'none' }}
+      skip_sonar: ${{
+        (github.event_name == 'workflow_dispatch' && inputs.skip_sonar == 'true') ||
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'Skip-Sonar'))
+        }}
       package_name: "com.cicdanduitest.androiduitest"
+      device-ip: ${{  inputs.device-ip  }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+      MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN  }}
 

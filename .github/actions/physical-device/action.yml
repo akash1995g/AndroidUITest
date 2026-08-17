@@ -1,0 +1,106 @@
+name: "Run Android UI Tests on Physical Device"
+description: "Runs Android UI tests using a real Android device connected to a self-hosted runner"
+author: "Akash"
+
+inputs:
+  gradle-task:
+    description: "Gradle UI test task to run"
+    default: "connectedDebugAndroidTest"
+  app-module:
+    description: "Module containing the app"
+    default: "app"
+  package:
+    description: "Android app package name"
+    required: true
+  device-ip:
+    description: "IP address of the Android device to connect"
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Grant execute permission for gradlew
+      shell: bash
+      run: chmod +x ./gradlew
+
+    - name: Connect to device ${{ inputs.device-ip }}
+      shell: bash
+      run: |
+        echo "Connecting to ${{ inputs.device-ip }}..."
+        adb connect ${{ inputs.device-ip }}:5555
+
+    - name: Ensure device is connected
+      shell: bash
+      run: |
+        echo "Checking for connected Android devices..."
+        DEVICE_ID=$(adb devices | sed '1d' | grep "${{ inputs.device-ip }}" | awk '{print $1}')
+        if [ -z "$DEVICE_ID" ]; then
+          echo "❌ Device ${{ inputs.device-ip }} not found!"
+          adb devices
+          exit 1
+        fi
+        echo "✔ Device detected: $DEVICE_ID"
+        echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+
+    - name: Build App & Test APK
+      shell: bash
+      run: |
+        ./gradlew assembleDebug assembleDebugAndroidTest
+
+    - name: Install APKs on Device
+      shell: bash
+      run: |
+        echo "Checking and uninstalling existing APKs..."
+
+        # Uninstall app if installed
+        if adb -s $DEVICE_ID shell pm list packages | grep -q "^package:${{ inputs.package-name }}$"; then
+          echo "Uninstalling existing app: ${{ inputs.package-name }}"
+          adb -s $DEVICE_ID uninstall ${{ inputs.package-name }}
+        fi
+
+        # Uninstall test APK if installed
+        if adb -s $DEVICE_ID shell pm list packages | grep -q "^package:${{ inputs.package-name }}.test$"; then
+          echo "Uninstalling existing test APK: ${{ inputs.package-name }}.test"
+          adb -s $DEVICE_ID uninstall ${{ inputs.package-name }}.test
+        fi
+
+        echo "Installing APKs..."
+        adb -s $DEVICE_ID install -r app/build/outputs/apk/debug/app-debug.apk
+        adb -s $DEVICE_ID install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+    
+
+    - name: Run Tests on Device
+      shell: bash
+      run: |
+        echo "Running tests on device $DEVICE_ID"
+        echo "${{ inputs.package }}.test/com.androidapp.anywifirouter.HiltTestRunner"
+        # Replace HiltTestRunner with AndroidJUnitRunner if not using Hilt
+        #  com.androidapp.anywifirouter.test/com.androidapp.anywifirouter.HiltTestRunner
+        #    ${{ inputs.package }}.test/androidx.test.runner.AndroidJUnitRunner
+        adb -s $DEVICE_ID shell am instrument -w \
+          ${{ inputs.package }}.test/com.androidapp.anywifirouter.HiltTestRunner
+
+    - name: Pull Test Results
+      shell: bash
+      run: |
+        mkdir -p test-results
+        adb -s $DEVICE_ID pull /sdcard/Android/media/${{ inputs.package-name }}/files/test-results test-results || true
+
+    - name: Upload Test Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ui-test-results
+        path: test-results

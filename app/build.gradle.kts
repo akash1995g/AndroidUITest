@@ -221,4 +221,10 @@ tasks.register("downloadReusableWorkflows") {
     }
 }
 
+createGitWorkflow {
+    overWrite = true
+    addMain = true
+}
+
+
 
