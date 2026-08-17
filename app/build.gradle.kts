@@ -10,7 +10,7 @@ plugins {
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt)
     alias(libs.plugins.build.logic)
-    id("com.baga.androidapp.androiddevelopmentteam.sonarqube.config")
+    alias(libs.plugins.sonarqube.config)
 }
 
 android {
